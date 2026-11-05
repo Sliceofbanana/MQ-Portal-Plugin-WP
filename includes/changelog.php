@@ -6,6 +6,14 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.31.0' => array(
+		'date'  => '2026-11-06',
+		'items' => array(
+			'Ready for delivery now shows how to reach the customer: name, phone (tap to call), SMS (opens the messaging app with the message typed in), email, and how they get the order (Pick up, courier or campus). Missing details say "No phone on file" / "No email on file". Details come from the online order, else from the invoice and the customer record.',
+			'New "Send email" button next to Copy message: emails the "order ready" message (with your edits) from the shop, with a Track my order button for online orders, and records "Customer notified via Email" by itself. Greyed out when there is no email on file; asks first if the customer was already notified.',
+			'Staff guide: Release and pick-up updated for the new contact details and Send email.',
+		),
+	),
 	'1.30.0' => array(
 		'date'  => '2026-11-06',
 		'items' => array(

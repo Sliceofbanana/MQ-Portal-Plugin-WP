@@ -270,6 +270,8 @@ body.no-scroll, body.side-open { overflow: hidden; }
 .ready-msg-wrap { display: grid; gap: .35rem; margin: .25rem 0 .75rem; }
 .ready-msg-wrap .actions { margin-top: 0; }
 .ready-msg { width: 100%; resize: vertical; }
+.reach { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem; padding: .6rem .75rem; margin: .25rem 0 .5rem; border: 1px solid var(--border); border-radius: var(--btn-radius); background: var(--surface); }
+.reach a { font-weight: 500; word-break: break-all; }
 .notice { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--btn-radius); padding: .6rem .8rem; }
 .notice-bad { color: var(--bad); border-color: #e9b8b3; }
 .related { display: flex; gap: .25rem; flex-wrap: wrap; }

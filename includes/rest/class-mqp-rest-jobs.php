@@ -22,6 +22,7 @@ class MQP_REST_Jobs {
 		'qc_approve'    => array( 'mq_qc', array( 'qc' ), 'ready' ),
 		'qc_reject'     => array( 'mq_qc', array( 'qc' ), 'production' ),
 		'notify'        => array( 'mq_deliver', array( 'ready' ), null ),
+		'email_ready'   => array( 'mq_deliver', array( 'ready' ), null ),
 		'delivered'     => array( 'mq_deliver', array( 'ready' ), 'delivered' ),
 		'priority'      => array( 'mq_sales', array( 'sales', 'creatives', 'production', 'qc', 'ready' ), null ),
 		'note'          => array( 'mq_access_portal', array( 'sales', 'creatives', 'production', 'qc', 'ready', 'delivered' ), null ),
@@ -179,10 +180,10 @@ class MQP_REST_Jobs {
 		$job['commission'] = $commission && ( current_user_can( 'mq_finance' ) || (int) $commission['sales_person_id'] === $uid )
 			? mqp_cast_row( $commission, array( 'id', 'job_id', 'sales_person_id' ), array( 'base_amount', 'rate', 'amount' ) )
 			: null;
-		if ( 'ready' === $job['stage'] ) {
-			// Ready-made "order ready" message staff copy and send on any app (the site sends nothing itself).
-			$person              = (string) $wpdb->get_var( $wpdb->prepare( 'SELECT customer_name FROM ' . mqp_table( 'documents' ) . ' WHERE id = %d', $row['document_id'] ) );
-			$job['ready_message'] = MQP_Order::ready_message( '' !== trim( $person ) ? trim( $person ) : $job['customer_name'], $job['number'] );
+		if ( 'ready' === $job['stage'] && current_user_can( 'mq_deliver' ) ) {
+			// How to reach the customer, and a ready-made "order ready" message staff copy or email.
+			$job['contact']       = self::contact( $id, (int) $row['document_id'] );
+			$job['ready_message'] = MQP_Order::ready_message( '' !== $job['contact']['name'] ? $job['contact']['name'] : $job['customer_name'], $job['number'] );
 		}
 		if ( ! self::sees_prices() ) {
 			// Creatives/production don't need prices.
@@ -191,6 +192,37 @@ class MQP_REST_Jobs {
 			}
 		}
 		return $job;
+	}
+
+	/**
+	 * The customer's name, phone, email and how they get the order: from the online order when
+	 * there is one, else from the invoice and its customer record.
+	 */
+	public static function contact( $job_id, $document_id ) {
+		global $wpdb;
+		$doc   = $wpdb->get_row( $wpdb->prepare( 'SELECT customer_id, customer_name, customer_contact FROM ' . mqp_table( 'documents' ) . ' WHERE id = %d', $document_id ), ARRAY_A );
+		$order = $wpdb->get_row( $wpdb->prepare( 'SELECT id, customer_name, customer_phone, customer_email, delivery_type, delivery_location FROM ' . mqp_table( 'orders' ) . ' WHERE job_id = %d ORDER BY id DESC LIMIT 1', $job_id ), ARRAY_A );
+		$email = $doc && $doc['customer_id'] ? (string) $wpdb->get_var( $wpdb->prepare( 'SELECT email FROM ' . mqp_table( 'customers' ) . ' WHERE id = %d', $doc['customer_id'] ) ) : '';
+		$out   = array(
+			'name'     => trim( (string) ( $doc['customer_name'] ?? '' ) ),
+			'phone'    => trim( (string) ( $doc['customer_contact'] ?? '' ) ),
+			'email'    => trim( $email ),
+			'delivery' => '',
+			'online'   => (bool) $order,
+		);
+		if ( $order ) {
+			$out['name']  = '' !== $out['name'] ? $out['name'] : trim( $order['customer_name'] );
+			$out['phone'] = '' !== trim( $order['customer_phone'] ) ? trim( $order['customer_phone'] ) : $out['phone'];
+			$out['email'] = '' !== trim( $order['customer_email'] ) ? trim( $order['customer_email'] ) : $out['email'];
+			$labels       = array( 'pickup' => 'Pick up', 'courier' => 'Courier', 'campus' => 'Campus delivery' );
+			$type         = $labels[ $order['delivery_type'] ] ?? '';
+			$where        = 'courier' === $order['delivery_type'] ? preg_replace( '/\s*—\s*pin:.*$/u', '', (string) $order['delivery_location'] ) : (string) $order['delivery_location'];
+			$out['delivery'] = trim( $type . ( '' !== $where && 'pickup' !== $order['delivery_type'] ? ': ' . $where : '' ) );
+		}
+		if ( ! is_email( $out['email'] ) ) {
+			$out['email'] = '';
+		}
+		return $out;
 	}
 
 	public static function get_item( WP_REST_Request $req ) {
@@ -456,6 +488,26 @@ class MQP_REST_Jobs {
 				$update['notified_at']  = mqp_now();
 				$update['notified_via'] = $via;
 				$note                   = trim( 'Customer notified via ' . $via . ( $note ? " — $note" : '' ) );
+				break;
+			case 'email_ready':
+				// Emails the "order ready" message (as edited by staff) and records it as the notification.
+				$to      = $job['contact']['email'] ?? '';
+				$message = trim( sanitize_textarea_field( (string) $req->get_param( 'message' ) ) );
+				if ( '' === $to ) {
+					return MQP_REST::error( 'This customer has no email address on file.' );
+				}
+				if ( '' === $message ) {
+					$message = $job['ready_message'];
+				}
+				$order  = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . mqp_table( 'orders' ) . ' WHERE job_id = %d ORDER BY id DESC LIMIT 1', $id ) );
+				$order  = $order ? MQP_Order::load( (int) $order ) : null;
+				$button = $order ? array( 'Track my order', MQP_Order::track_link( $order ) ) : null;
+				if ( ! MQP_Mail::send( $to, 'Your order ' . $job['number'] . ' is ready', 'Your order is ready', array( $message ), $button ) ) {
+					return MQP_REST::error( 'The email could not be sent. Check the site\'s email settings, or notify the customer another way.', 500 );
+				}
+				$update['notified_at']  = mqp_now();
+				$update['notified_via'] = 'Email';
+				$note                   = 'Customer notified via Email (sent from the portal to ' . $to . ")\n" . $message;
 				break;
 			case 'delivered':
 				$update['delivered_at'] = mqp_now();

@@ -9,7 +9,7 @@ const ACTION_LABELS = {
   created: 'Job order created', save_specs: 'Specifications', assign: 'Sales person assigned', to_creatives: 'Sent to Creatives',
   needs_editing: 'Needs editing', back_to_sales: 'Returned to Sales', approve_files: 'Approved for printing', approve_print: 'Approved for printing by Sales (no Creatives)',
   printed: 'Printed / produced', qc_approve: 'QC approved — ready for delivery', qc_reject: 'QC rejected',
-  notify: 'Customer notified', delivered: 'Delivered', priority: 'Priority', note: 'Note', payment: 'Payment',
+  notify: 'Customer notified', email_ready: 'Ready email sent', delivered: 'Delivered', priority: 'Priority', note: 'Note', payment: 'Payment',
   cancelled: 'Cancelled', file_design: 'Design attached', file_proof: 'Proof attached', file_reference: 'File attached', file_customer: 'Customer file attached', online_order: 'Online order received',
 };
 
@@ -270,8 +270,31 @@ function stageActions(job, act) {
           toast('Message copied. Paste it in SMS, Messenger or Viber.');
           setTimeout(() => { b.textContent = 'Copy message'; }, 2000);
         }) : null;
+        // Send the message by email from the portal; it is recorded as "Customer notified via Email".
+        const c = job.contact || {};
+        const emailBtn = msg ? h('button.btn', {
+          type: 'button', disabled: !c.email, title: c.email ? 'Send to ' + c.email : 'No email on file',
+          onclick: async e => {
+            const b = e.currentTarget;
+            if (job.notified_at && !(await confirmBox('Already notified', `The customer was notified ${fmtDate(job.notified_at, true)} via ${job.notified_via}. Email them again?`, 'Send email'))) return;
+            if (await act('email_ready', { message: msg.value }, b)) toast('Email sent to ' + c.email + '.', 'ok');
+          },
+        }, 'Send email') : null;
+        // Where to reach the customer: tap to call, text (message filled in on phones) or email.
+        const tel = (c.phone || '').replace(/[^\d+]/g, '');
+        const smsHref = () => 'sms:' + tel + '?body=' + encodeURIComponent(msg ? msg.value : job.ready_message || '');
+        const smsLink = tel ? h('a', { href: smsHref(), title: 'Opens your messaging app with the message' }, 'SMS') : null;
+        if (msg && smsLink) msg.addEventListener('input', () => { smsLink.href = smsHref(); });
+        const reach = h('div.reach',
+          h('strong', c.name || job.customer_name),
+          tel ? [h('a', { href: 'tel:' + tel }, '📞 ' + c.phone), smsLink]
+            : h('span.muted', c.phone ? c.phone : 'No phone on file'),
+          c.email ? h('a', { href: 'mailto:' + c.email }, '✉ ' + c.email) : h('span.muted', 'No email on file'),
+          c.delivery ? badge(c.delivery, 'info') : null);
         box.append(h('h3', 'Ready for delivery'),
-          msg ? h('div.ready-msg-wrap', h('span.muted', 'Message for the customer (you can edit it before copying)'), msg, h('div.actions', copyBtn)) : null,
+          job.contact ? reach : null,
+          c.online ? h('p.muted', 'Online order: the customer already got an automatic "Your order is ready" email when QC approved it.') : null,
+          msg ? h('div.ready-msg-wrap', h('span.muted', 'Message for the customer (you can edit it before sending)'), msg, h('div.actions', copyBtn, emailBtn)) : null,
           h('div.inline-form', h('span', 'Notify customer via'), via, btn(job.notified_at ? 'Notified again' : 'Customer notified', e => act('notify', { via: via.value }, e.currentTarget))),
           h('div.actions', btn('Mark as delivered ✓', async e => {
             if (job.balance > 0 && !(await confirmBox('Balance unpaid', `This job still has a balance of ${money(job.balance)}. Mark as delivered anyway?`, 'Mark delivered'))) return;
