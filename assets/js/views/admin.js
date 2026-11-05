@@ -1208,7 +1208,7 @@ function orderPricing(c, mark) {
       body: bind(c, 'pickup_hint', { 'aria-label': 'Pick up last line' }) }),
     setting({ title: 'Courier: last line', help: 'Shown at the bottom of the Maxim / Lalamove / Grab choice on the order page. Blank = none.',
       body: bind(c, 'courier_hint', { 'aria-label': 'Courier last line' }) }),
-    setting({ title: '"Order ready" message', wide: true, help: 'Staff copy this from a job under Ready for delivery and send it by SMS, Messenger or Viber. {name} = customer name, {order} = job order number.',
+    setting({ title: '"Order ready" message', wide: true, help: 'Staff copy this from a job under Ready for delivery and send it by Messenger or Viber, or by email with Send email. {name} = customer name, {order} = job order number.',
       body: h('textarea', { rows: 2, value: c.ready_message, 'aria-label': 'Order ready message', oninput: e => { c.ready_message = e.target.value; } }) }),
     setting({ title: 'Guide for file instructions', help: 'Shown in each file\'s instructions box.',
       body: h('textarea', { rows: 2, value: c.note_guide, 'aria-label': 'Guide for file instructions', oninput: e => { c.note_guide = e.target.value; } }) }),

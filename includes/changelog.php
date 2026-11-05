@@ -6,6 +6,12 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.31.2' => array(
+		'date'  => '2026-11-06',
+		'items' => array(
+			'Ready for delivery: SMS removed from "Notify customer via". The choices are now Messenger (the default), Call, Email and Viber. Jobs already recorded as notified by SMS still show it in their history.',
+		),
+	),
 	'1.31.1' => array(
 		'date'  => '2026-11-06',
 		'items' => array(

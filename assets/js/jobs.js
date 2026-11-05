@@ -260,14 +260,14 @@ function stageActions(job, act) {
       break;
     case 'ready':
       if (can('mq_deliver')) {
-        const via = select('via', ['SMS', 'Call', 'Messenger', 'Email', 'Viber'].map(v => ({ value: v, label: v })), 'SMS');
+        const via = select('via', ['Messenger', 'Call', 'Email', 'Viber'].map(v => ({ value: v, label: v })), 'Messenger');
         // Ready-made message: staff copy it and send it themselves on any app.
         const msg = job.ready_message ? h('textarea.ready-msg', { rows: 3, 'aria-label': 'Message for the customer', value: job.ready_message }) : null;
         const copyBtn = msg ? btn('Copy message', async e => {
           const b = e.currentTarget;
           try { await navigator.clipboard.writeText(msg.value); } catch (_) { msg.select(); document.execCommand('copy'); }
           b.textContent = 'Copied ✓';
-          toast('Message copied. Paste it in SMS, Messenger or Viber.');
+          toast('Message copied. Paste it in Messenger or Viber.');
           setTimeout(() => { b.textContent = 'Copy message'; }, 2000);
         }) : null;
         // Send the message by email from the portal; it is recorded as "Customer notified via Email".
