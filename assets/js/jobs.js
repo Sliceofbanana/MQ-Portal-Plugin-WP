@@ -261,7 +261,17 @@ function stageActions(job, act) {
     case 'ready':
       if (can('mq_deliver')) {
         const via = select('via', ['SMS', 'Call', 'Messenger', 'Email', 'Viber'].map(v => ({ value: v, label: v })), 'SMS');
+        // Ready-made message: staff copy it and send it themselves on any app.
+        const msg = job.ready_message ? h('textarea.ready-msg', { rows: 3, 'aria-label': 'Message for the customer', value: job.ready_message }) : null;
+        const copyBtn = msg ? btn('Copy message', async e => {
+          const b = e.currentTarget;
+          try { await navigator.clipboard.writeText(msg.value); } catch (_) { msg.select(); document.execCommand('copy'); }
+          b.textContent = 'Copied ✓';
+          toast('Message copied. Paste it in SMS, Messenger or Viber.');
+          setTimeout(() => { b.textContent = 'Copy message'; }, 2000);
+        }) : null;
         box.append(h('h3', 'Ready for delivery'),
+          msg ? h('div.ready-msg-wrap', h('span.muted', 'Message for the customer (you can edit it before copying)'), msg, h('div.actions', copyBtn)) : null,
           h('div.inline-form', h('span', 'Notify customer via'), via, btn(job.notified_at ? 'Notified again' : 'Customer notified', e => act('notify', { via: via.value }, e.currentTarget))),
           h('div.actions', btn('Mark as delivered ✓', async e => {
             if (job.balance > 0 && !(await confirmBox('Balance unpaid', `This job still has a balance of ${money(job.balance)}. Mark as delivered anyway?`, 'Mark delivered'))) return;

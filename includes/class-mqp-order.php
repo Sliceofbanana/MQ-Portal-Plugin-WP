@@ -79,6 +79,11 @@ class MQP_Order {
 				'University of the Philippines Cebu',
 			),
 			'courier_note'  => 'We message you on Messenger when your order is ready; then you book the rider yourself. The delivery fee is paid to the rider.',
+			// Last line on the Pick up and courier choices on the order page (owner, 2026-11-06).
+			'pickup_hint'   => 'Message us via Facebook Page for pick up time.',
+			'courier_hint'  => 'Inform the rider to call 09205177884 when arrived at our location.',
+			// Message staff copy when an order is ready. {name} = customer, {order} = job order number.
+			'ready_message' => 'Hi {name}! This is MQ Prints. Your order {order} is now ready for delivery. Daghang salamat!',
 			// Pick up: one place for now (more can come back later as a list).
 			'pickup'        => array(
 				'name'    => 'MQ Printing Services Main Office',
@@ -214,7 +219,7 @@ class MQP_Order {
 				}
 			}
 		}
-		foreach ( array( 'courier_note', 'notice', 'note_guide' ) as $k ) {
+		foreach ( array( 'courier_note', 'notice', 'note_guide', 'pickup_hint', 'courier_hint', 'ready_message' ) as $k ) {
 			if ( isset( $in[ $k ] ) ) {
 				$cfg[ $k ] = sanitize_textarea_field( (string) $in[ $k ] );
 			}
@@ -451,6 +456,15 @@ html.mqo-lock,html.mqo-lock body{overflow:hidden!important}
 		);
 		include MQP_DIR . 'templates/order.php';
 		exit;
+	}
+
+	/** The "order ready" message for staff to copy, with the customer's name and order number filled in. */
+	public static function ready_message( $name, $number ) {
+		$tpl = (string) self::config()['ready_message'];
+		if ( '' === trim( $tpl ) ) {
+			$tpl = self::default_config()['ready_message'];
+		}
+		return strtr( $tpl, array( '{name}' => (string) $name, '{order}' => (string) $number ) );
 	}
 
 	/** Choices for the order page (no secrets). */

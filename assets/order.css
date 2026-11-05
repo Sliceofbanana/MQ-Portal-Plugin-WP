@@ -78,6 +78,8 @@ textarea { resize: vertical; }
 .o-choice strong { color: var(--text); }
 .o-choice small { color: var(--muted); }
 .o-choice-sm { padding: .75rem; }
+/* Last line of a choice (e.g. "Message us via Facebook Page for pick up time."), kept at the bottom of the card. */
+.o-choice .o-choice-hint { margin-top: auto; padding-top: .5rem; border-top: 1px dashed var(--line); width: 100%; color: var(--text); font-weight: 500; }
 .o-choice-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 8px; border: 1px solid var(--line); color: var(--muted); margin-bottom: .3rem; }
 .o-choice.is-on .o-choice-icon { color: var(--navy); border-color: var(--navy); }
 .o-price { font-weight: 700; color: var(--text); }

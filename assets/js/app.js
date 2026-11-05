@@ -5,6 +5,9 @@ import { bell } from './notifications.js';
 import { startSync, outbox, syncNow, discard, retry, forgetUser, stillSignedIn } from './offline.js';
 import { icon } from './icons.js';
 
+// Staff guide (SOPs), shipped with the plugin; ?v= so a new version is never served from an old cache.
+const GUIDE_URL = cfg.assetsUrl + 'staff-guide.html?v=' + encodeURIComponent(cfg.version);
+
 // Pages in the nav. Home and Time Clock are for everyone; departments follow permissions.
 const TABS = [
   { key: 'home', label: 'Home', icon: 'home', caps: null, load: () => import('./views/home.js') },
@@ -207,6 +210,7 @@ function shell() {
     h('a.dropdown-item', { href: '#/profile', role: 'menuitem' }, icon('user'), 'My profile'),
     h('a.dropdown-item', { href: '#/settings', role: 'menuitem' }, icon('settings'), 'My settings'),
     h('a.dropdown-item', { href: '#/clock', role: 'menuitem' }, icon('clock'), 'Time clock'),
+    h('a.dropdown-item', { href: GUIDE_URL, target: '_blank', rel: 'noopener', role: 'menuitem' }, icon('book'), 'Staff guide'),
     can('mq_manage') ? h('a.dropdown-item', { href: '#/admin/settings', role: 'menuitem' }, icon('shield'), 'Portal settings') : null,
     h('div.dropdown-sep'),
     h('button.dropdown-item.danger', { type: 'button', role: 'menuitem', onclick: logout }, icon('logout'), 'Log out'));
@@ -235,6 +239,7 @@ function shell() {
     // My settings and Log out are in the account menu (top right).
     h('div.side-foot',
       h('a', { href: '#/profile', dataset: { tab: 'profile' } }, icon('user'), h('span', 'My profile')),
+      h('a', { href: GUIDE_URL, target: '_blank', rel: 'noopener' }, icon('book'), h('span', 'Staff guide')),
       SETTINGS.caps.some(can) ? h('a', { href: '#/admin/settings', dataset: { tab: SETTINGS.tab, sub: SETTINGS.sub } }, icon('settings'), h('span', SETTINGS.label)) : null));
   const backdrop = h('div.side-backdrop', { onclick: () => sidebarOpen(false) });
   function sidebarOpen(open) {

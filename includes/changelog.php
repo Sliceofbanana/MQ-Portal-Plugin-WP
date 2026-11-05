@@ -6,6 +6,15 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.30.0' => array(
+		'date'  => '2026-11-06',
+		'items' => array(
+			'New: a ready-made message under Ready for delivery: "Hi {name}! This is MQ Prints. Your order {order} is now ready for delivery. Daghang salamat!", with the customer name and job order number filled in. Staff can edit it, tap Copy message and paste it in SMS, Messenger or Viber, then tap Customer notified. The portal does not send it by itself.',
+			'New: on the order page, the Pick up choice ends with "Message us via Facebook Page for pick up time." and the Maxim / Lalamove / Grab choice ends with "Inform the rider to call 09205177884 when arrived at our location."',
+			'All three texts can be changed in Admin → Settings → Order page.',
+			'New: the Staff guide (step-by-step procedures for each position) is now in the portal: "Staff guide" at the bottom of the menu and in the account menu (top right). It opens in a new tab and also works offline. Updated for this version: Approve for Printing for basic documents, Email to customer on invoices, the Needs quotation card, accepted file types, the Copy message step and the new Settings.',
+		),
+	),
 	'1.29.0' => array(
 		'date'  => '2026-11-05',
 		'items' => array(

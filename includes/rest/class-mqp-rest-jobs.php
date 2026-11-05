@@ -179,6 +179,11 @@ class MQP_REST_Jobs {
 		$job['commission'] = $commission && ( current_user_can( 'mq_finance' ) || (int) $commission['sales_person_id'] === $uid )
 			? mqp_cast_row( $commission, array( 'id', 'job_id', 'sales_person_id' ), array( 'base_amount', 'rate', 'amount' ) )
 			: null;
+		if ( 'ready' === $job['stage'] ) {
+			// Ready-made "order ready" message staff copy and send on any app (the site sends nothing itself).
+			$person              = (string) $wpdb->get_var( $wpdb->prepare( 'SELECT customer_name FROM ' . mqp_table( 'documents' ) . ' WHERE id = %d', $row['document_id'] ) );
+			$job['ready_message'] = MQP_Order::ready_message( '' !== trim( $person ) ? trim( $person ) : $job['customer_name'], $job['number'] );
+		}
 		if ( ! self::sees_prices() ) {
 			// Creatives/production don't need prices.
 			foreach ( $job['items'] as &$it ) {

@@ -357,20 +357,21 @@
     var d = S.delivery;
     var F = P.features || {};
     // A feature switched to "soon" in Settings is shown with a Coming soon badge and can't be chosen.
-    var opt = function (type, icon, title, text) {
+    var opt = function (type, icon, title, text, hint) {
       var state = type === 'pickup' ? 'on' : F[type] || 'on';
       if (state === 'off') return null;
       var soon = state === 'soon';
       return h('button.o-choice', { type: 'button', class: (d.type === type ? 'is-on' : '') + (soon ? ' is-soon' : ''), disabled: soon, 'aria-disabled': soon ? 'true' : null,
         onclick: function () { if (!soon) { d.type = type; render(); } } },
-        h('span.o-choice-icon', svg(icon)), h('strong', title, soon ? h('span.o-soon', 'Coming soon') : null), h('small', text));
+        h('span.o-choice-icon', svg(icon)), h('strong', title, soon ? h('span.o-soon', 'Coming soon') : null), h('small', text),
+        hint && !soon ? h('small.o-choice-hint', hint) : null);
     };
     var names = P.couriers.map(function (c) { return c.name; });
     var body = [
       h('h3.o-sub', 'How do you want to get your order?'),
       h('div.o-choices.o-choices-3',
-        opt('pickup', ICON.pin, 'Pick up', 'Free — at ' + P.pickup.name + '.'),
-        P.couriers.length ? opt('courier', ICON.bike, names.join(' / '), 'You book the rider when your order is ready.') : null,
+        opt('pickup', ICON.pin, 'Pick up', 'Free — at ' + P.pickup.name + '.', P.pickup_hint),
+        P.couriers.length ? opt('courier', ICON.bike, names.join(' / '), 'You book the rider when your order is ready.', P.courier_hint) : null,
         P.campuses.length ? opt('campus', ICON.school, 'Campus delivery', 'We deliver to your school.') : null),
     ];
     if (d.type === 'campus') {

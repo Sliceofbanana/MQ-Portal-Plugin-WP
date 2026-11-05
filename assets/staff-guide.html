@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MQ Portal Staff Guide</title>
+<link rel="icon" href="icon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky left contents rail + one reading column; each SOP is a numbered step card. */
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --fg: #172033;
+  --muted: #5b6478;
+  --line: #dfe3ec;
+  --navy: #1f2f6b;
+  --orange: #e8701a;
+  --orange-soft: #fff2e6;
+  --navy-soft: #eaeefb;
+  --ok: #1d7a46;
+  --ok-soft: #e5f5ec;
+  --bad: #b3261e;
+  --bad-soft: #fdecea;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151f; --surface: #191f2c; --fg: #e8ebf2; --muted: #a2aabb; --line: #2c3446;
+    --navy: #9db0f5; --orange: #ff9a4d; --orange-soft: #33241a; --navy-soft: #1e2640;
+    --ok: #6fd39b; --ok-soft: #173126; --bad: #ff8a80; --bad-soft: #3a1d1b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151f; --surface: #191f2c; --fg: #e8ebf2; --muted: #a2aabb; --line: #2c3446;
+  --navy: #9db0f5; --orange: #ff9a4d; --orange-soft: #33241a; --navy-soft: #1e2640;
+  --ok: #6fd39b; --ok-soft: #173126; --bad: #ff8a80; --bad-soft: #3a1d1b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+a { color: var(--navy); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
+header.top { grid-column: 1 / -1; display: grid; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.eyebrow { font: 600 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--orange); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(2rem, 4vw, 2.8rem); color: var(--navy); }
+h2 { font-size: 1.65rem; color: var(--navy); }
+h3 { font-size: 1.15rem; }
+.lede { max-width: 65ch; color: var(--muted); margin: 0; }
+.search { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+.search input { flex: 1 1 260px; min-width: 0; font: inherit; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); }
+.search input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 600 13px/1 var(--body); padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--surface); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; display: grid; gap: 2px; font-size: 14px; }
+nav.toc .grp { font: 600 11px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+nav.toc a { text-decoration: none; color: var(--fg); padding: 4px 8px; border-radius: 6px; }
+nav.toc a:hover { background: var(--navy-soft); }
+main { display: grid; gap: 48px; min-width: 0; }
+section.part { display: grid; gap: 18px; scroll-margin-top: 20px; }
+section.part > p, .card > p { margin: 0; max-width: 70ch; }
+.roles { display: flex; flex-wrap: wrap; gap: 6px; }
+.role { font: 600 12px/1 var(--body); padding: 5px 9px; border-radius: 6px; background: var(--navy-soft); color: var(--navy); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: grid; gap: 12px; min-width: 0; }
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+ol.steps > li::before { content: counter(s); font: 700 14px/30px var(--display); text-align: center; width: 30px; height: 30px; border-radius: 50%; background: var(--orange-soft); color: var(--orange); }
+ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.ui { font: 500 .86em/1 var(--mono); background: var(--navy-soft); color: var(--navy); padding: 3px 6px; border-radius: 5px; white-space: nowrap; }
+.path { font-weight: 600; }
+.rule { border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; }
+.rule.do { background: var(--ok-soft); }
+.rule.dont { background: var(--bad-soft); }
+.rule strong { font-family: var(--display); }
+.rule.do strong { color: var(--ok); }
+.rule.dont strong { color: var(--bad); }
+.flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; }
+.flow span.st { padding: 6px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); font-weight: 600; }
+.flow span.ar { color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 12px/1.2 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+details.faq { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details.faq summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq summary::after { content: "+"; color: var(--orange); font-weight: 700; }
+details.faq[open] summary::after { content: "−"; }
+details.faq > div { padding: 0 18px 16px; display: grid; gap: 8px; }
+.faqs { display: grid; gap: 8px; }
+.empty { color: var(--muted); }
+footer.end { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  nav.toc .grp { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">MQ Printing Services · Staff handbook · Portal 1.30</span>
+    <h1>MQ Portal Staff Guide</h1>
+    <p class="lede">A tour of the portal and the step-by-step procedures (SOPs) for each job at the shop. If you are stuck, search below or pick your position.</p>
+    <div class="search">
+      <input id="q" type="search" placeholder="Search, e.g. RUSH, void, printer counter, delete order" aria-label="Search the guide">
+    </div>
+    <div class="chips" role="group" aria-label="Show procedures for">
+      <button class="chip" type="button" data-role="all" aria-pressed="true">Everyone</button>
+      <button class="chip" type="button" data-role="sales" aria-pressed="false">Sales</button>
+      <button class="chip" type="button" data-role="creatives" aria-pressed="false">Creatives</button>
+      <button class="chip" type="button" data-role="production" aria-pressed="false">Production</button>
+      <button class="chip" type="button" data-role="qc" aria-pressed="false">QC Officer</button>
+      <button class="chip" type="button" data-role="cashier" aria-pressed="false">Cashier (POS)</button>
+      <button class="chip" type="button" data-role="admin" aria-pressed="false">Admin / Owner</button>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Contents">
+    <div class="grp">Walkthrough</div>
+    <a href="#start">Logging in</a>
+    <a href="#tour">The screens</a>
+    <a href="#journey">How an order moves</a>
+    <a href="#golden">Shop rules</a>
+    <div class="grp">SOPs</div>
+    <a href="#sop-clock">Time clock</a>
+    <a href="#sop-online">Online orders</a>
+    <a href="#sop-walkin">Walk-in and quotations</a>
+    <a href="#sop-uploads">Customer uploads</a>
+    <a href="#sop-payment">Recording payments</a>
+    <a href="#sop-creatives">Creatives</a>
+    <a href="#sop-production">Production</a>
+    <a href="#sop-qc">Quality check</a>
+    <a href="#sop-release">Release and pick-up</a>
+    <a href="#sop-pos">POS sale</a>
+    <a href="#sop-eod">End of day</a>
+    <a href="#sop-daily">Daily check</a>
+    <a href="#sop-delete">Delete or void</a>
+    <a href="#sop-settings">Settings</a>
+    <div class="grp">Help</div>
+    <a href="#faq">When you are confused</a>
+  </nav>
+
+  <main>
+    <!-- ================= WALKTHROUGH ================= -->
+    <section class="part" id="start" data-roles="all">
+      <span class="eyebrow">Walkthrough</span>
+      <h2>Logging in</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open the portal link the owner gave you on the shop computer or your phone. Log in with your email and password.</div></li>
+          <li><div>No account yet? Tap <span class="ui">Request an account</span>. The owner approves it and gives you your position (Sales, Creatives, Production, QC Officer, Cashier, or Admin / Finance / Ops).</div></li>
+          <li><div>On a phone, use the browser's <span class="ui">Add to Home screen</span> or <span class="ui">Install app</span> so the portal opens like an app.</div></li>
+          <li><div>Check your name and mobile number in <span class="path">your name (top right) → My profile</span>. Change your password there too.</div></li>
+        </ol>
+        <p>Open this guide any time from <span class="path">Staff guide</span> at the bottom of the menu, or from your name (top right).</p>
+        <p>You only see the tabs your position needs. If a tab you need is missing, ask the owner to check your position in <span class="path">Admin → Staff</span>.</p>
+      </div>
+    </section>
+
+    <section class="part" id="tour" data-roles="all">
+      <h2>The screens</h2>
+      <div class="table-wrap card">
+        <table>
+          <thead><tr><th>Tab</th><th>What it is for</th><th>Who sees it</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Home</strong></td><td>Your to-do list: new online orders to price, uploads to check, jobs waiting for you, today's sales. Sales and admins also see a <strong>Needs quotation</strong> card at the top: website quotation requests still waiting for prices, oldest first. Past 20 hours they are marked Late and the card turns red.</td><td>Everyone</td></tr>
+            <tr><td><strong>Time Clock</strong></td><td>Clock in, take a break, clock out. Shows your hours for the week.</td><td>Everyone</td></tr>
+            <tr><td><strong>Sales</strong></td><td><span class="path">Invoice Manager</span> (quotations, billing statements, invoices), <span class="path">Customers</span>, <span class="path">Online orders</span>, <span class="path">Customer uploads</span>, <span class="path">Job orders</span>, <span class="path">My commissions</span>.</td><td>Sales, Admin, Owner</td></tr>
+            <tr><td><strong>Creatives</strong></td><td>Files to check and designs to edit before printing.</td><td>Creatives, Owner</td></tr>
+            <tr><td><strong>Production &amp; QC</strong></td><td>The print queue, quality check and jobs ready for release. Also the TV monitor board.</td><td>Production, QC, Owner</td></tr>
+            <tr><td><strong>POS</strong></td><td>Walk-in sales, today's receipts, end of day, printer counter.</td><td>Cashier, Admin, Owner</td></tr>
+            <tr><td><strong>Admin</strong></td><td>Daily check, reports, sales by brand, all invoices, commissions, attendance, reviews, staff, settings.</td><td>Admin / Finance, Owner</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="part" id="journey" data-roles="all">
+      <h2>How an order moves</h2>
+      <p>Every printing job, walk-in or online, becomes a <strong>job order</strong>. It moves through these stages, and each team only acts on its own stage.</p>
+      <div class="card">
+        <div class="flow" aria-label="Job order stages">
+          <span class="st">Sales</span><span class="ar">→</span>
+          <span class="st">Creatives</span><span class="ar">→</span>
+          <span class="st">Production</span><span class="ar">→</span>
+          <span class="st">Quality Check</span><span class="ar">→</span>
+          <span class="st">Ready for Delivery</span><span class="ar">→</span>
+          <span class="st">Delivered</span>
+        </div>
+        <ul>
+          <li><strong>Sales</strong> sets the price, records the payment and fills in the specifications. Files that need checking or editing go to Creatives. Basic document printing that needs no checking goes straight to Production with <span class="ui">Approve for Printing</span>.</li>
+          <li><strong>Creatives</strong> (only when needed) check the files, edit if needed, and approve them for printing.</li>
+          <li><strong>Production</strong> prints and marks the job as printed.</li>
+          <li><strong>QC</strong> checks the output. Approve, or reject it back to Production.</li>
+          <li><strong>Release</strong>: notify the customer, then mark it delivered when they get it.</li>
+        </ul>
+        <p>A job marked <span class="ui">RUSH</span> shows a red badge on every list and goes to the top of the queue.</p>
+      </div>
+    </section>
+
+    <section class="part" id="golden" data-roles="all">
+      <h2>Shop rules</h2>
+      <p>These keep the shop's records complete. The Daily check page shows the owner when one is skipped.</p>
+      <div class="card">
+        <div class="rule do"><strong>Always</strong>
+          <ul>
+            <li>Log every sale. Walk-ins go in the POS; anything printed to order gets an invoice and a job order.</li>
+            <li>Print only from a job order or a POS receipt.</li>
+            <li>Write down the printer counter when the shop opens and closes.</li>
+            <li>Record the payment the moment you receive it, with the GCash or bank reference number.</li>
+            <li>Give the customer a receipt or their order number.</li>
+          </ul>
+        </div>
+        <div class="rule dont"><strong>Never</strong>
+          <ul>
+            <li>Print for a customer "off the system", even small jobs.</li>
+            <li>Void a receipt or delete an order without a true reason. Every void and delete is logged with your name and emailed to the owner.</li>
+            <li>Share your login. Each action is saved under the person who is logged in.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SOPs ================= -->
+    <section class="part" id="sop-clock" data-roles="all sales creatives production qc cashier admin">
+      <span class="eyebrow">SOP · Everyone</span>
+      <h2>Time clock</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>When you arrive, connect to the shop Wi-Fi and turn on your phone's location.</div></li>
+          <li><div>Open <span class="path">Time Clock</span> and tap <span class="ui">Clock in</span>. Allow the location request.</div></li>
+          <li><div>For a break, tap <span class="ui">Start break</span>, then <span class="ui">End break</span> when you return.</div></li>
+          <li><div>Before you leave, tap <span class="ui">Clock out</span>.</div></li>
+        </ol>
+        <p>"You need to be at the shop to clock in" means the portal could not confirm you are at the shop. Connect to the shop Wi-Fi and allow location, then try again. If it still fails, tell the owner the time you arrived.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-online" data-roles="sales admin">
+      <span class="eyebrow">SOP · Sales</span>
+      <h2>Handling an online order</h2>
+      <p>Customers order on the website in 3 steps and do not pay yet. They get an order number that starts with <span class="ui">MQ-</span> and use it when they message the Facebook page.</p>
+      <div class="card">
+        <ol class="steps">
+          <li><div>A new order shows on <span class="path">Home</span> under "New online orders to price", and you get an email. Open <span class="path">Sales → Online orders</span> and click the order. Orders with status <span class="ui">New</span> have no price yet.</div></li>
+          <li><div>Read the <strong>Files</strong> table. Each file shows what it is for, the page count for documents, and the customer's <strong>complete instructions</strong> (copies, colored or B&amp;W, size, paper). Very large files may come as a screenshot plus a Google Drive link.</div></li>
+          <li><div>Click <span class="ui">Set the price (invoice)</span>. Fill in the price for each line and save.</div></li>
+          <li><div>Tap <span class="ui">Email to customer</span> on the invoice, or message them on the Facebook page with the order number and the price. The customer also sees the price and the payment QR codes on their tracking page.</div></li>
+          <li><div>When they send proof of payment, record it on the invoice. See <a href="#sop-payment">Recording payments</a>.</div></li>
+          <li><div>Click <span class="ui">Open job order (files, RUSH)</span>. Check the specifications and tap <span class="ui">Mark as RUSH</span> if the customer needs it urgently.</div></li>
+          <li><div>Choose where it goes next:
+            <ul>
+              <li>Files need checking or editing: tick <em>The file requires review/checking/editing</em> and tap <span class="ui">Send to Creatives →</span>.</li>
+              <li>Basic document printing only: tick <em>Basic document printing only</em> and <em>No need for Creatives to review/check/edit</em>, then tap <span class="ui">Approve for Printing</span>. It goes straight to Production.</li>
+            </ul></div></li>
+        </ol>
+        <p><strong>Delivery:</strong> "Pick up" means they come to MQ Printing Services Main Office; the order page tells them to message the Facebook page for a pick-up time. "Courier" means the customer books Maxim, Lalamove or Grab once you tell them the order is ready. You do not book the rider. The order page tells them to have the rider call 09205177884 on arrival.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-walkin" data-roles="sales admin">
+      <span class="eyebrow">SOP · Sales</span>
+      <h2>Walk-in customer or quotation</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Go to <span class="path">Sales → Invoice Manager</span>. Tap <span class="ui">Create quotation</span> if the customer is still deciding, or <span class="ui">Create invoice</span> if they are ordering now.</div></li>
+          <li><div>Pick the brand and branch, then search for the customer or add a new one (name, contact number, email).</div></li>
+          <li><div>Add each item with its description and specifications, quantity and unit price. Set the due date.</div></li>
+          <li><div>Save. Use <span class="ui">Print / PDF</span> or <span class="ui">Email to customer</span> to send it.</div></li>
+          <li><div>When the customer agrees, open the quotation and tap <span class="ui">→ Invoice</span>. The invoice creates the job order.</div></li>
+          <li><div>Record the payment and complete the specifications on the job order. Then send it to Creatives, or tap <span class="ui">Approve for Printing</span> for basic document printing (see <a href="#sop-online">Online orders</a>, last step).</div></li>
+        </ol>
+        <p>Small over-the-counter items (photocopy, a few prints, office supplies paid on the spot) go through the <a href="#sop-pos">POS</a> instead.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-uploads" data-roles="sales admin">
+      <span class="eyebrow">SOP · Sales</span>
+      <h2>Customer uploads</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open <span class="path">Sales → Customer uploads</span>. New files show under <span class="ui">New</span>.</div></li>
+          <li><div>Download and check the file.</div></li>
+          <li><div>Turn it into a quotation or invoice. The upload moves to <span class="ui">Converted to document</span>.</div></li>
+          <li><div>If it is spam or a duplicate, tap <span class="ui">Dismiss</span>.</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="part" id="sop-payment" data-roles="sales admin cashier">
+      <span class="eyebrow">SOP · Sales</span>
+      <h2>Recording a payment</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open the invoice in <span class="path">Sales → Invoice Manager</span> (or from the online order).</div></li>
+          <li><div>Tap <span class="ui">Record payment</span>. Enter the amount, the method (cash, GCash, bank) and the reference number from the customer's screenshot.</div></li>
+          <li><div>Tap <span class="ui">Save payment</span>. The job order's payment check turns green.</div></li>
+        </ol>
+        <p>Recording a payment on a quotation or billing statement creates the invoice and its job order automatically. If the internet is down, the payment saves on the device and syncs later.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-creatives" data-roles="creatives admin">
+      <span class="eyebrow">SOP · Creatives</span>
+      <h2>Checking files</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open <span class="path">Creatives</span>. Jobs with a red <span class="ui">RUSH</span> badge go first.</div></li>
+          <li><div>Open the job order and download the customer's files. Read the specifications and the customer's notes.</div></li>
+          <li><div>File is fine: tap <span class="ui">Approve for printing →</span>.</div></li>
+          <li><div>File needs work: tap <span class="ui">Needs editing</span>, write what needs fixing, make the edit, attach the edited design to the job order, then approve.</div></li>
+          <li><div>Something missing or unclear (wrong size, missing file): tap <span class="ui">← Back to Sales</span> and say what is needed.</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="part" id="sop-production" data-roles="production admin">
+      <span class="eyebrow">SOP · Production</span>
+      <h2>Printing a job</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open <span class="path">Production &amp; QC</span>. The <strong>Production queue</strong> lists approved jobs, RUSH first.</div></li>
+          <li><div>Open the job order and download the approved design. Print exactly what the specifications say.</div></li>
+          <li><div>Tap <span class="ui">Printed / produced → send to QC</span>.</div></li>
+        </ol>
+        <p>If QC rejects the job, it comes back to your queue with QC's note. Fix it and mark it printed again.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-qc" data-roles="qc admin">
+      <span class="eyebrow">SOP · QC Officer</span>
+      <h2>Quality check</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open <span class="path">Production &amp; QC</span>. Jobs waiting are under <strong>Quality check</strong>.</div></li>
+          <li><div>Compare the output with the specifications: size, quantity, colors, paper, cut and finish.</div></li>
+          <li><div>All good: tap <span class="ui">APPROVED / READY FOR DELIVERY</span>.</div></li>
+          <li><div>Problem found: tap <span class="ui">Reject → back to Production</span> and write what is wrong.</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="part" id="sop-release" data-roles="sales qc admin">
+      <span class="eyebrow">SOP · Sales / QC</span>
+      <h2>Release and pick-up</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open the job under <strong>Ready for delivery</strong>.</div></li>
+          <li><div>Tap <span class="ui">Copy message</span>. The "order ready" message already has the customer's name and order number; edit it first if you need to. Paste it in SMS, Messenger or Viber and send it. The portal does not send it for you.</div></li>
+          <li><div>Choose how you told them (SMS, Call, Messenger, Email or Viber) and tap <span class="ui">Customer notified</span>. For courier orders, tell them to book their rider now. The rider calls 09205177884 on arrival.</div></li>
+          <li><div>When they pick it up, check the balance. Collect it and record it on the invoice first.</div></li>
+          <li><div>Tap <span class="ui">Mark as delivered ✓</span>. If a balance is still unpaid the portal warns you; only continue if the owner allowed it.</div></li>
+        </ol>
+        <p>Jobs released with a balance are listed on the owner's Daily check.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-pos" data-roles="cashier admin">
+      <span class="eyebrow">SOP · Cashier</span>
+      <h2>A POS sale</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Open <span class="path">POS → Register</span>. Check the branch at the top.</div></li>
+          <li><div>Tap items to add them, adjust the quantity, or add a <span class="ui">Custom item</span>.</div></li>
+          <li><div>Tap <span class="ui">Charge</span>. Choose the payment method; for cash, enter the cash received and give the change shown.</div></li>
+          <li><div>Keep <span class="ui">Print receipt</span> ticked and tap <span class="ui">Complete sale</span>. Hand the receipt to the customer.</div></li>
+        </ol>
+        <p>Offline? The sale saves on the device and syncs when the internet is back. Reprint a receipt from <span class="path">POS → Today's receipts → Reprint</span>.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-eod" data-roles="cashier admin">
+      <span class="eyebrow">SOP · Cashier</span>
+      <h2>Opening and closing the shop</h2>
+      <div class="card">
+        <h3>When the shop opens</h3>
+        <ol class="steps">
+          <li><div>Open <span class="path">POS → Printer counter</span>.</div></li>
+          <li><div>For each printer, read the total page counter from the printer's screen or report and save it.</div></li>
+        </ol>
+        <h3>When the shop closes</h3>
+        <ol class="steps">
+          <li><div>Write down the printer counters again in <span class="path">POS → Printer counter</span>.</div></li>
+          <li><div>Open <span class="path">POS → End of day</span>. Count the cash and compare it with the cash total. Check GCash and bank totals against the payments received.</div></li>
+          <li><div>Report any difference to the owner right away.</div></li>
+        </ol>
+        <p>A counter lower than the last one (after a printer reset or repair) asks for a note. Explain what happened.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-daily" data-roles="admin">
+      <span class="eyebrow">SOP · Admin / Owner</span>
+      <h2>The daily check</h2>
+      <p>Every morning the owner gets an email with yesterday's numbers. The same report is on <span class="path">Admin → Daily check</span>, for any date.</p>
+      <div class="card">
+        <ol class="steps">
+          <li><div>Look at <strong>Money in</strong>: POS sales and invoice payments for the day.</div></li>
+          <li><div>Look at <strong>Printer counter vs pages sold</strong>. A flagged gap means more pages were printed than sold. Ask the shop what was printed.</div></li>
+          <li><div>Check <strong>Voided receipts</strong>, <strong>voided documents</strong> and <strong>deleted online orders</strong>. Each shows who did it and why.</div></li>
+          <li><div>Check <strong>Online orders without a price</strong> and <strong>Customer uploads waiting</strong>: customers waiting for a reply.</div></li>
+          <li><div>Check <strong>Job orders released with a balance</strong>.</div></li>
+          <li><div>If a printer has no counter for the day, remind the cashier.</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="part" id="sop-delete" data-roles="admin cashier sales">
+      <span class="eyebrow">SOP · Admin / Owner</span>
+      <h2>Deleting an order or voiding a receipt</h2>
+      <div class="card">
+        <ul>
+          <li><strong>Delete an online order</strong> (Admin and Owner only): open it in <span class="path">Sales → Online orders</span>, tap <span class="ui">Delete order</span> and type the reason. This removes the order, its invoice, job order and files. An order with a recorded payment cannot be deleted.</li>
+          <li><strong>Void a POS receipt</strong>: <span class="path">POS → Today's receipts → Void receipt</span>, with a reason. Only staff allowed to void see this.</li>
+          <li><strong>Void a quotation or invoice</strong>: open it in the Invoice Manager and void it, with a reason.</li>
+        </ul>
+        <p>Every delete and void is saved in the activity log with the name and reason, shows on the Daily check, and is emailed to the admins.</p>
+      </div>
+    </section>
+
+    <section class="part" id="sop-settings" data-roles="admin">
+      <span class="eyebrow">SOP · Admin / Owner</span>
+      <h2>Settings you will change</h2>
+      <div class="table-wrap card">
+        <table>
+          <thead><tr><th>To change</th><th>Go to</th></tr></thead>
+          <tbody>
+            <tr><td>Pick-up place, courier pin addresses, campus list, Facebook chat link, payment QR codes, office supplies, notice on the order page</td><td><span class="path">Admin → Settings → Order page</span></td></tr>
+            <tr><td>Last line on the Pick up and courier choices, and the "order ready" message staff copy</td><td><span class="path">Admin → Settings → Order page</span></td></tr>
+            <tr><td>Logos (portal menu, printed invoices, sign-in page)</td><td><span class="path">wp-admin → MQ Portal → System → Settings → Logos</span></td></tr>
+            <tr><td>Turn campus delivery, courier or office supplies on, to "Coming soon", or off</td><td><span class="path">Admin → Settings → Orders → Features on the order page</span></td></tr>
+            <tr><td>Show only MQ Printing Services on Get Quotation</td><td><span class="path">Admin → Settings → Company</span></td></tr>
+            <tr><td>Daily email report on or off</td><td><span class="path">Admin → Settings → Orders</span></td></tr>
+            <tr><td>Add staff, change positions, approve account requests</td><td><span class="path">Admin → Staff</span> and <span class="path">Admin → Account requests</span></td></tr>
+            <tr><td>Approve website reviews</td><td><span class="path">Admin → Reviews</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section class="part" id="faq" data-roles="all sales creatives production qc cashier admin">
+      <span class="eyebrow">Help</span>
+      <h2>When you are confused</h2>
+      <div class="faqs">
+        <details class="faq" data-roles="sales admin"><summary>"Send to Creatives" or "Approve for Printing" is greyed out</summary><div><p>The job order shows two checklists and what is missing in each. Both need payment received, specifications complete and a sales person assigned. Send to Creatives also needs <em>The file requires review/checking/editing</em> ticked. Approve for Printing needs <em>Basic document printing only</em> and <em>No need for Creatives to review/check/edit</em> ticked. Record the payment or finish the specifications, then try again.</p></div></details>
+        <details class="faq" data-roles="all"><summary>I cannot find a job order</summary><div><p>Use the search box in <span class="path">Sales → Job orders</span> with the customer name, job order number, or the online order number (MQ-…). Set the stage filter to "All". Sales staff only see their own job orders unless allowed to see all.</p></div></details>
+        <details class="faq" data-roles="sales admin"><summary>A customer messaged with an MQ- number</summary><div><p>That is their online order number. Search it in <span class="path">Sales → Online orders</span>.</p></div></details>
+        <details class="faq" data-roles="sales admin"><summary>The customer uploaded the wrong file type</summary><div><p>The order page accepts PDF for documents and print-and-bind, and PDF, JPEG, PNG or PSD for everything else, up to 100 MB per file. Files too large can be sent as a screenshot plus a Google Drive link. If they have another format, ask them to email it to info@mqprintsph.com with their name and order number, then attach it to the job order.</p></div></details>
+        <details class="faq" data-roles="all"><summary>The portal says I'm offline</summary><div><p>POS sales and payments still save on the device and sync when the internet returns. Clocking in and out needs the internet.</p></div></details>
+        <details class="faq" data-roles="cashier admin"><summary>The receipt did not print</summary><div><p>Check the printer has paper and is on. Go to <span class="path">POS → Today's receipts</span> and tap <span class="ui">Reprint</span>. In the print window, pick the thermal printer.</p></div></details>
+        <details class="faq" data-roles="all"><summary>I pressed the wrong button on a job</summary><div><p>Do not try to fix it by pressing more buttons. Tell the owner or admin with the job order number. Every step is in the job's history, so it can be put back.</p></div></details>
+        <details class="faq" data-roles="all"><summary>A tab or button I need is missing</summary><div><p>Your position decides what you see. Ask the owner to check your position in <span class="path">Admin → Staff</span>.</p></div></details>
+        <details class="faq" data-roles="all"><summary>I forgot my password</summary><div><p>Ask the owner to set a new password for you in <span class="path">Admin → Staff</span>. Change it to your own in <span class="path">My profile → Password</span> after you log in.</p></div></details>
+      </div>
+      <p class="empty" id="none" hidden>Nothing matches. Try another word, or ask the owner.</p>
+    </section>
+
+    <footer class="end">MQ Printing Services · Questions about the portal: ask the owner, or email info@mqprintsph.com.</footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var q = document.getElementById('q');
+  var chips = document.querySelectorAll('.chip');
+  var parts = document.querySelectorAll('main section.part');
+  var faqs = document.querySelectorAll('details.faq');
+  var none = document.getElementById('none');
+  var role = 'all';
+  function rolesOf(el) { return (el.getAttribute('data-roles') || 'all').split(' '); }
+  function apply() {
+    var term = q.value.trim().toLowerCase();
+    var shown = 0;
+    faqs.forEach(function (f) {
+      var okRole = role === 'all' || rolesOf(f).indexOf(role) > -1 || rolesOf(f).indexOf('all') > -1;
+      var okText = !term || f.textContent.toLowerCase().indexOf(term) > -1;
+      f.hidden = !(okRole && okText);
+      if (term && okText) f.open = true;
+    });
+    parts.forEach(function (p) {
+      var okRole = role === 'all' || rolesOf(p).indexOf(role) > -1;
+      var okText = !term || p.textContent.toLowerCase().indexOf(term) > -1;
+      p.hidden = !(okRole && okText);
+      if (!p.hidden) shown++;
+    });
+    none.hidden = shown > 0;
+    if (shown === 0) document.getElementById('faq').hidden = false;
+  }
+  q.addEventListener('input', apply);
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      role = c.getAttribute('data-role');
+      chips.forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+      try { localStorage.setItem('mq-guide-role', role); } catch (e) {}
+      apply();
+    });
+  });
+  try {
+    var saved = localStorage.getItem('mq-guide-role');
+    if (saved) { var c = document.querySelector('.chip[data-role="' + saved + '"]'); if (c) c.click(); }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

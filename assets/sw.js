@@ -7,7 +7,7 @@ const PORTAL = '__PORTAL__';
 const CACHE = 'mq-portal-' + VERSION;
 
 const FILES = [
-  'portal.css', 'icon-64.png', 'icon-192.png', 'logo-white.webp', 'logo-wide.webp', 'logo-color.webp', 'login-photo.jpg',
+  'portal.css', 'icon-64.png', 'icon-192.png', 'logo-white.webp', 'logo-wide.webp', 'logo-color.webp', 'login-photo.jpg', 'staff-guide.html',
   'js/app.js', 'js/core.js', 'js/offline.js', 'js/notifications.js', 'js/print.js', 'js/jobs.js', 'js/icons.js',
   'js/views/home.js', 'js/views/orders.js', 'js/views/clock.js', 'js/views/account.js', 'js/views/sales.js', 'js/views/creatives.js', 'js/views/production.js', 'js/views/admin.js', 'js/views/pos.js', 'js/views/daily.js',
 ].map(f => ASSETS + f + '?v=' + encodeURIComponent(VERSION)); // The same addresses the portal page asks for.
