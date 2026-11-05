@@ -25,7 +25,7 @@ export function printDocument(doc) {
   const node = h('div.print-doc',
     h('header.pd-head',
       h('div',
-        h('img.pd-logo', { src: cfg.assetsUrl + 'logo-white.webp', alt: '' }),
+        h('img.pd-logo', { src: cfg.assetsUrl + 'logo-wide.webp', alt: '' }),
         h('div.pd-company', s.company_name),
         h('div.pd-brand', brandName(doc.brand_id) + (doc.branch_id ? ' · ' + branchName(doc.branch_id) : '')),
         h('div.pd-small', lines(s.company_address)),

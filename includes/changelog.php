@@ -6,6 +6,12 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.28.0' => array(
+		'date'  => '2026-11-05',
+		'items' => array(
+			'New MQ PRINTS / PRINTING SERVICES logo everywhere the wordmark was shown: the staff portal menu, the staff sign-in page, the order page header and printed invoices, quotations and job orders (in colour). Thermal receipts print it in black. The cube icon is unchanged.',
+		),
+	),
 	'1.27.1' => array(
 		'date'  => '2026-11-05',
 		'items' => array(

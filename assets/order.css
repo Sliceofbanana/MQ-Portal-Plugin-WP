@@ -22,7 +22,7 @@ textarea { resize: vertical; }
 .o-wrap { max-width: 1160px; margin: 0 auto; padding: 0 1.25rem; }
 .o-header { background: var(--navy); color: #fff; position: sticky; top: 0; z-index: 20; }
 .o-header-in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 60px; }
-.o-logo img { height: 26px; display: block; }
+.o-logo img { height: 38px; width: auto; display: block; }
 .o-nav { display: flex; gap: .25rem; }
 .o-nav a { color: rgba(255, 255, 255, .82); text-decoration: none; font-size: .88rem; font-weight: 500; padding: .45rem .75rem; border-radius: 6px; }
 .o-nav a:hover { color: #fff; background: rgba(255, 255, 255, .07); }
@@ -242,7 +242,7 @@ body.is-embed .o-wrap { max-width: none; }
 }
 @media (max-width: 600px) {
   .o-header-in { height: 56px; }
-  .o-logo img { height: 22px; }
+  .o-logo img { height: 32px; }
   .o-nav-home { display: none; }
   .o-nav a { padding: .4rem .5rem; font-size: .8rem; }
   .o-panel { padding: 1.1rem; }
