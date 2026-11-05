@@ -280,15 +280,11 @@ function stageActions(job, act) {
             if (await act('email_ready', { message: msg.value }, b)) toast('Email sent to ' + c.email + '.', 'ok');
           },
         }, 'Send email') : null;
-        // Where to reach the customer: tap to call, text (message filled in on phones) or email.
+        // Where to reach the customer: tap to call, or email.
         const tel = (c.phone || '').replace(/[^\d+]/g, '');
-        const smsHref = () => 'sms:' + tel + '?body=' + encodeURIComponent(msg ? msg.value : job.ready_message || '');
-        const smsLink = tel ? h('a', { href: smsHref(), title: 'Opens your messaging app with the message' }, 'SMS') : null;
-        if (msg && smsLink) msg.addEventListener('input', () => { smsLink.href = smsHref(); });
         const reach = h('div.reach',
           h('strong', c.name || job.customer_name),
-          tel ? [h('a', { href: 'tel:' + tel }, '📞 ' + c.phone), smsLink]
-            : h('span.muted', c.phone ? c.phone : 'No phone on file'),
+          tel ? h('a', { href: 'tel:' + tel }, '📞 ' + c.phone) : h('span.muted', c.phone ? c.phone : 'No phone on file'),
           c.email ? h('a', { href: 'mailto:' + c.email }, '✉ ' + c.email) : h('span.muted', 'No email on file'),
           c.delivery ? badge(c.delivery, 'info') : null);
         box.append(h('h3', 'Ready for delivery'),

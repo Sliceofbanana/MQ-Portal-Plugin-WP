@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       MQ Portal
  * Description:       Staff portal for MQ Printing Services: online ordering (/order/), customer file uploads, Invoice Manager (quotations, billing statements, invoices), job order workflow (Sales → Creatives → Production & QC → Delivery), POS, time clock and the owner dashboard.
- * Version:           1.31.0
+ * Version:           1.31.1
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Genesis Esdrilon Jr
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MQP_VERSION', '1.31.0' );
+define( 'MQP_VERSION', '1.31.1' );
 define( 'MQP_FILE', __FILE__ );
 define( 'MQP_DIR', plugin_dir_path( __FILE__ ) );
 require_once MQP_DIR . 'includes/class-mqp-domain.php';

@@ -6,6 +6,12 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.31.1' => array(
+		'date'  => '2026-11-06',
+		'items' => array(
+			'Ready for delivery: removed the SMS link from the customer\'s details (it did nothing on the shop computer). To text a customer, use Copy message and paste it in your messaging app. Tap to call and Send email stay.',
+		),
+	),
 	'1.31.0' => array(
 		'date'  => '2026-11-06',
 		'items' => array(
