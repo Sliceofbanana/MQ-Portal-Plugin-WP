@@ -285,4 +285,5 @@ html.mqp-lock, html.mqp-lock body { overflow: hidden !important; }
 .mqp-consent { display: flex !important; align-items: flex-start; gap: 10px; margin: 2px 0 0; font-size: .88rem; line-height: 1.45; color: #4b5563; font-weight: 400; cursor: pointer; }
 .mqp-consent input { flex: none; width: 18px !important; height: 18px; margin: 1px 0 0 !important; accent-color: #1e3a8a; }
 .mqp-consent a { color: #1e3a8a; text-decoration: underline; }
-.mqp-up .mqp-drop-inner small.mqp-drop-types { line-height: 1.6; font-size: .9rem; }
+.mqp-up .mqp-drop-inner small.mqp-drop-types { display: block; max-width: 34rem; margin: 0 auto; line-height: 1.55; font-size: .9rem; font-style: italic; white-space: pre-wrap; }
+.mqp-up .mqp-drop-inner small.mqp-drop-types em { font-style: italic; color: inherit !important; font-family: inherit; font-size: inherit; }

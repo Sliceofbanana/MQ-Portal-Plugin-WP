@@ -6,6 +6,12 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.27.1' => array(
+		'date'  => '2026-11-05',
+		'items' => array(
+			'Website upload box [mq_upload]: the accepted file types (✔️ PDF format for documents ✔️ JPEG / PNG format for images ✔️ JPEG / PNG / PSD format for HD designs) are now one italic paragraph instead of three lines.',
+		),
+	),
 	'1.27.0' => array(
 		'date'  => '2026-11-05',
 		'items' => array(

@@ -241,7 +241,7 @@ class MQP_Upload {
 		$first = ! self::$rendered;
 		self::$rendered = true;
 		$text  = '' !== $atts['text'] ? $atts['text'] : 'Start Uploading Files';
-		// The file types, one per line (owner's wording, 2026-11-05).
+		// The file types as one italic line of text (owner's wording, 2026-11-05).
 		$hint  = array( '✔️ PDF format for documents', '✔️ JPEG / PNG format for images', '✔️ JPEG / PNG / PSD format for HD designs' );
 		$url   = MQP_Order::url();
 		$icon  = '<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>';
@@ -254,7 +254,7 @@ class MQP_Upload {
 				<span class="mqp-drop-inner">
 					<?php echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput -- fixed SVG. ?>
 					<strong><?php echo esc_html( $text ); ?></strong>
-					<small class="mqp-drop-types"><?php echo implode( '<br>', array_map( 'esc_html', $hint ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- each line escaped. ?></small>
+					<small class="mqp-drop-types"><em><?php echo esc_html( implode( '  ', $hint ) ); ?></em></small>
 				</span>
 			</label>
 			<noscript><p class="mqp-msg"><a href="<?php echo esc_url( $url ); ?>">Start your order</a></p></noscript>
