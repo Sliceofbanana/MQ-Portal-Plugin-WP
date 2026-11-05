@@ -5,14 +5,14 @@ defined( 'ABSPATH' ) || exit;
  * Updates from GitHub releases: wp-admin → Plugins shows "Update available" when the repository
  * has a newer release, and "Update now" (or auto-updates) installs it — no zip upload by hand.
  *
- * - Repository: MQP_UPDATE_REPO in wp-config.php, else Sliceofbanana/mq-portal.
+ * - Repository: MQP_UPDATE_REPO in wp-config.php, else Sliceofbanana/MQ-Portal-Plugin-WP.
  * - Private repository: put a read-only token in wp-config.php:
  *     define( 'MQP_GITHUB_TOKEN', 'github_pat_…' );
  * - Each release needs an asset named mq-portal.zip (the GitHub Action builds it on every v* tag).
  */
 class MQP_Updater {
 
-	const REPO      = 'Sliceofbanana/mq-portal';
+	const REPO      = 'Sliceofbanana/MQ-Portal-Plugin-WP';
 	const ASSET     = 'mq-portal.zip';
 	const SLUG      = 'mq-portal';
 	const TRANSIENT = 'mqp_gh_release';
