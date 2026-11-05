@@ -542,7 +542,7 @@
       var priced = o.items && o.items.length && o.total > 0;
       var paid = o.invoice_status === 'paid';
       var qty = function (l) { var q = Number(l.qty); return (q % 1 ? q.toFixed(2) : String(q)) + ' ' + (l.unit || ''); };
-      return h('section.o-pay',
+      return h('section.o-payment',
         h('h3', 'Payment'),
         priced ? [
           h('table.o-bill',

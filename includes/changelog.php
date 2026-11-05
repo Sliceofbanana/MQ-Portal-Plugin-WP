@@ -6,6 +6,14 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.29.0' => array(
+		'date'  => '2026-11-05',
+		'items' => array(
+			'New: upload your own logos in wp-admin → MQ Portal → System → Settings → Logos. Three choices, each with "Choose from Media Library" and "Use the default": the white logo (portal menu, staff sign-in photo, order page header; thermal receipts print it in black), the colour logo (printed invoices, quotations, billing statements and job orders) and the small icon (above the sign-in form and on the quotation page customers see).',
+			'Fixed: after an update some screens kept showing the old logo saved in the browser. Logos now load from an address that changes with every upload and every plugin version.',
+			'Fixed: on the tracking page the new Payment section was squeezed into three columns. The price breakdown now shows above the QR codes.',
+		),
+	),
 	'1.28.0' => array(
 		'date'  => '2026-11-05',
 		'items' => array(

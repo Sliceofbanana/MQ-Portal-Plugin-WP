@@ -47,9 +47,10 @@ class MQP_System {
 			return;
 		}
 		wp_enqueue_media();
+		// One picker for every image setting: a button with data-field (hidden input), data-preview and data-title.
 		wp_add_inline_script(
 			'media-editor',
-			"jQuery(function($){var f;$('#mqp-login-photo-choose').on('click',function(e){e.preventDefault();if(!f){f=wp.media({title:'Photo for the staff sign-in page',button:{text:'Use this photo'},library:{type:'image'},multiple:false});f.on('select',function(){var a=f.state().get('selection').first().toJSON();var u=(a.sizes&&a.sizes.large?a.sizes.large.url:a.url);$('#mqp-login_photo').val(a.id);$('#mqp-login-photo-preview').attr('src',u);$('#mqp-login-photo-reset').prop('hidden',false);});}f.open();});$('#mqp-login-photo-reset').on('click',function(e){e.preventDefault();$('#mqp-login_photo').val(0);$('#mqp-login-photo-preview').attr('src',$(this).data('default'));$(this).prop('hidden',true);});});"
+			"jQuery(function($){var frames={};$(document).on('click','.mqp-media-choose',function(e){e.preventDefault();var b=$(this),k=b.data('field');if(!frames[k]){frames[k]=wp.media({title:b.data('title'),button:{text:'Use this image'},library:{type:'image'},multiple:false});frames[k].on('select',function(){var a=frames[k].state().get('selection').first().toJSON();var u=(b.data('size')==='large'&&a.sizes&&a.sizes.large?a.sizes.large.url:a.url);$('#'+k).val(a.id);$(b.data('preview')).attr('src',u);b.siblings('.mqp-media-reset').prop('hidden',false);});}frames[k].open();});$(document).on('click','.mqp-media-reset',function(e){e.preventDefault();var b=$(this);$('#'+b.data('field')).val(0);$(b.data('preview')).attr('src',b.data('default'));b.prop('hidden',true);});});"
 		);
 	}
 
@@ -634,14 +635,38 @@ class MQP_System {
 		$row( 'Storage nearly full at', $numfield( 'archive_at_percent', 10, 100, '%' ), 'Of “Portal files at most”: an archive is made right away.', 'archive_at_percent' );
 		echo '</tbody></table></div>';
 
+		// Logos: each previewed on the background it is used on.
+		$where = array(
+			'light' => 'Portal menu, staff sign-in photo, order page header. Thermal receipts print it in black. Use a white logo with a transparent background (PNG or WebP).',
+			'color' => 'Printed invoices, quotations, billing statements and job orders. Use the full-colour logo with a transparent or white background.',
+			'mark'  => 'Above the staff sign-in form and on the customer\'s quotation page. A square or upright version of the logo works best.',
+		);
+		echo '<div class="mqp-card"><h2>Logos</h2><p class="description" style="margin-top:0">Choose or upload your logos, then click Save settings. The portal, the order page and printouts use them right away. Each upload has its own address, so nobody keeps seeing an old logo from their browser\'s memory.</p><table class="form-table" role="presentation"><tbody>';
+		foreach ( MQP_Monitor::LOGOS as $key => $logo ) {
+			$field = 'logo_' . $key;
+			$bg    = 'light' === $key ? '#1e3a8a' : '#fff';
+			$row(
+				$logo[0],
+				'<div class="mqp-photo-pick"><span style="display:inline-flex;align-items:center;justify-content:center;width:240px;height:96px;padding:12px;box-sizing:border-box;border:1px solid #c3c4c7;border-radius:6px;background:' . $bg . '">'
+				. '<img id="mqp-' . $field . '-preview" src="' . esc_url( MQP_Monitor::logo( $key ) ) . '" alt="" style="width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;border:0;border-radius:0;background:none"></span><div>'
+				. '<input type="hidden" id="mqp-' . $field . '" name="' . $field . '" value="' . (int) $s[ $field ] . '">'
+				. '<button type="button" class="button mqp-media-choose" data-field="mqp-' . $field . '" data-preview="#mqp-' . $field . '-preview" data-title="' . esc_attr( $logo[0] ) . '">Choose from Media Library</button> '
+				. '<button type="button" class="button-link mqp-media-reset" data-field="mqp-' . $field . '" data-preview="#mqp-' . $field . '-preview" data-default="' . esc_url( MQP_Monitor::default_logo( $key ) ) . '"' . ( $s[ $field ] ? '' : ' hidden' ) . '>Use the default</button>'
+				. '</div></div>',
+				$where[ $key ],
+				$field
+			);
+		}
+		echo '</tbody></table></div>';
+
 		$photo = MQP_Monitor::login_photo();
 		echo '<div class="mqp-card"><h2>Staff sign-in page</h2><table class="form-table" role="presentation"><tbody>';
 		$row(
 			'Photo',
 			'<div class="mqp-photo-pick"><img id="mqp-login-photo-preview" src="' . esc_url( $photo ) . '" alt=""><div>'
 			. '<input type="hidden" id="mqp-login_photo" name="login_photo" value="' . (int) $s['login_photo'] . '">'
-			. '<button type="button" class="button" id="mqp-login-photo-choose">Choose from Media Library</button> '
-			. '<button type="button" class="button-link" id="mqp-login-photo-reset" data-default="' . esc_url( MQP_URL . 'assets/login-photo.jpg' ) . '"' . ( $s['login_photo'] ? '' : ' hidden' ) . '>Use the default photo</button>'
+			. '<button type="button" class="button mqp-media-choose" data-field="mqp-login_photo" data-preview="#mqp-login-photo-preview" data-size="large" data-title="Photo for the staff sign-in page">Choose from Media Library</button> '
+			. '<button type="button" class="button-link mqp-media-reset" data-field="mqp-login_photo" data-preview="#mqp-login-photo-preview" data-default="' . esc_url( MQP_URL . 'assets/login-photo.jpg' ) . '"' . ( $s['login_photo'] ? '' : ' hidden' ) . '>Use the default photo</button>'
 			. '</div></div>',
 			'Shown beside the sign-in form (on phones, at the top). Pick a wide photo of your shop or work, at least 1200 px. Then click Save settings.',
 			'login_photo'

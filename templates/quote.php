@@ -89,7 +89,7 @@ td small { display: block; color: var(--muted); white-space: pre-line; }
 <main class="sheet">
 	<header class="head">
 		<div class="co">
-			<img src="<?php echo esc_url( MQP_URL . 'assets/logo-color.webp' ); ?>" alt="">
+			<img src="<?php echo esc_url( MQP_Monitor::logo( 'mark' ) ); ?>" alt="">
 			<div><strong><?php echo esc_html( $s['company_name'] ); ?></strong><span><?php echo esc_html( $s['company_address'] ); ?></span><span><?php echo esc_html( $s['company_contact'] ); ?></span></div>
 		</div>
 		<div class="doc">

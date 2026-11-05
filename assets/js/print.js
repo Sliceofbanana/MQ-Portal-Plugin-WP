@@ -25,7 +25,7 @@ export function printDocument(doc) {
   const node = h('div.print-doc',
     h('header.pd-head',
       h('div',
-        h('img.pd-logo', { src: cfg.assetsUrl + 'logo-wide.webp', alt: '' }),
+        h('img.pd-logo', { src: cfg.logos.color, alt: '' }),
         h('div.pd-company', s.company_name),
         h('div.pd-brand', brandName(doc.brand_id) + (doc.branch_id ? ' · ' + branchName(doc.branch_id) : '')),
         h('div.pd-small', lines(s.company_address)),
@@ -77,7 +77,7 @@ export function printDocument(doc) {
 export function printReceipt(sale) {
   const s = cfg.settings;
   const node = h('div.print-receipt',
-    h('div.pr-center', h('img.pr-logo', { src: cfg.assetsUrl + 'logo-white.webp', alt: '' })),
+    h('div.pr-center', h('img.pr-logo', { src: cfg.logos.light, alt: '' })),
     h('div.pr-center', h('strong', s.company_name)),
     h('div.pr-center', branchName(sale.branch_id)),
     h('div.pr-center', s.company_contact),

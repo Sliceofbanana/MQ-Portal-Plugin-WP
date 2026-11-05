@@ -32,7 +32,7 @@ $title  = 'track' === $config['mode'] ? 'Track your order' : 'Order online';
 <body class="<?php echo $config['embed'] ? 'is-embed' : ''; ?>">
 <header class="o-header">
 	<div class="o-wrap o-header-in">
-		<a class="o-logo" href="<?php echo esc_url( $config['homeUrl'] ); ?>"><img src="<?php echo esc_url( $assets . 'logo-white.webp' ); ?>" alt="<?php echo esc_attr( $config['company']['name'] ); ?>"></a>
+		<a class="o-logo" href="<?php echo esc_url( $config['homeUrl'] ); ?>"><img src="<?php echo esc_url( MQP_Monitor::logo( 'light' ) ); ?>" alt="<?php echo esc_attr( $config['company']['name'] ); ?>"></a>
 		<nav class="o-nav">
 			<a href="<?php echo esc_url( $config['orderUrl'] ); ?>" class="<?php echo 'new' === $config['mode'] ? 'active' : ''; ?>">Order online</a>
 			<a href="<?php echo esc_url( $config['homeUrl'] ); ?>" class="o-nav-home">Back to website</a>

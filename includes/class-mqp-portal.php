@@ -134,6 +134,8 @@ class MQP_Portal {
 			// "Back to website" and the photo on the sign-in page (wp-admin → System → Settings).
 			'siteUrl'    => esc_url_raw( MQP_Domain::to_main( home_url( '/' ) ) ),
 			'loginPhoto' => esc_url_raw( MQP_Monitor::login_photo() ),
+			// Logos (wp-admin → System → Settings → Logos): light (white), color, mark.
+			'logos'      => array_map( 'esc_url_raw', MQP_Monitor::logos() ),
 			'loggedIn'  => $logged,
 			// Maintenance message when the portal is closed for this person ('' = open).
 			'maintenance' => MQP_Monitor::maintenance_for(),

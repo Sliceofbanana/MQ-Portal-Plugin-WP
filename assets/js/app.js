@@ -60,7 +60,7 @@ if ('serviceWorker' in navigator) {
 /* ---------- Login ---------- */
 
 // The MQ cube: the white logo used as a mask, painted blue on top and orange below.
-const loginMark = () => h('img.login-mark', { src: cfg.assetsUrl + 'logo-color.webp', alt: 'MQ Prints', width: 72, height: 82 });
+const loginMark = () => h('img.login-mark', { src: cfg.logos.mark, alt: 'MQ Prints', width: 72, height: 82 });
 
 // Input with an icon on the left; password inputs get a show/hide button on the right.
 function iconInput(ic, attrs) {
@@ -117,7 +117,7 @@ function loginScreen() {
  */
 function loginLayout(card) {
   const photo = h('section.login-photo', { style: `--photo: url("${cfg.loginPhoto || cfg.assetsUrl + 'login-photo.jpg'}")` },
-    h('img.login-photo-logo', { src: cfg.assetsUrl + 'logo-white.webp', alt: '' }),
+    h('img.login-photo-logo', { src: cfg.logos.light, alt: '' }),
     h('div.login-photo-text',
       h('strong', 'Welcome back, team!'),
       h('span', 'Job orders, sales, production and your time clock — all in one place.')));
@@ -229,7 +229,7 @@ function shell() {
   const sidebar = h('aside.sidebar', { 'aria-label': 'Main menu', onclick: e => { if (e.target.closest('a')) sidebarOpen(false); } },
     h('div.side-head',
       h('a.brand', { href: '#/home', 'aria-label': 'MQ Prints Staff Portal — home' },
-        h('img', { src: cfg.assetsUrl + 'logo-white.webp', alt: 'MQ Prints' }), h('span', 'Staff Portal')),
+        h('img', { src: cfg.logos.light, alt: 'MQ Prints' }), h('span', 'Staff Portal')),
       h('button.icon-btn.side-close', { type: 'button', 'aria-label': 'Close menu', onclick: () => sidebarOpen(false) }, icon('close', 20))),
     h('nav.side-nav', tabs.map(t => (kids(t).length ? sideGroup(t) : h('a', { href: '#/' + t.key, dataset: { tab: t.key } }, icon(t.icon), h('span', t.label))))),
     // My settings and Log out are in the account menu (top right).

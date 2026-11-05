@@ -86,6 +86,10 @@ class MQP_Monitor {
 			'archive_at_percent' => 80,   // "Nearly full": this share of "Portal files at most".
 			// Staff sign-in page: photo from the Media Library (0 = the workshop photo that comes with the plugin).
 			'login_photo'     => 0,
+			// Logos from the Media Library (0 = the one that comes with the plugin). See logo().
+			'logo_light'      => 0,
+			'logo_color'      => 0,
+			'logo_mark'       => 0,
 			// Deleting the plugin also deletes its data (off = data is kept).
 			'delete_data'     => 0,
 		);
@@ -136,6 +140,9 @@ class MQP_Monitor {
 				'archive_max_mb'     => $num( 'archive_max_mb', 50, 4096 ),
 				'archive_at_percent' => $num( 'archive_at_percent', 10, 100 ),
 				'login_photo'     => isset( $in['login_photo'] ) && wp_attachment_is_image( (int) $in['login_photo'] ) ? (int) $in['login_photo'] : 0,
+				'logo_light'    => isset( $in['logo_light'] ) && wp_attachment_is_image( (int) $in['logo_light'] ) ? (int) $in['logo_light'] : 0,
+				'logo_color'    => isset( $in['logo_color'] ) && wp_attachment_is_image( (int) $in['logo_color'] ) ? (int) $in['logo_color'] : 0,
+				'logo_mark'     => isset( $in['logo_mark'] ) && wp_attachment_is_image( (int) $in['logo_mark'] ) ? (int) $in['logo_mark'] : 0,
 				'delete_data'     => empty( $in['delete_data'] ) ? 0 : 1,
 			),
 			false
@@ -148,6 +155,33 @@ class MQP_Monitor {
 		$id  = (int) self::settings()['login_photo'];
 		$src = $id ? wp_get_attachment_image_src( $id, 'large' ) : false;
 		return $src ? $src[0] : MQP_URL . 'assets/login-photo.jpg';
+	}
+
+	/** The three logos: what each is for, and the file that comes with the plugin. */
+	const LOGOS = array(
+		'light' => array( 'Logo for dark backgrounds (white)', 'logo-white.webp' ),
+		'color' => array( 'Logo for light backgrounds (colour)', 'logo-wide.webp' ),
+		'mark'  => array( 'Small icon', 'logo-color.webp' ),
+	);
+
+	/**
+	 * A logo's address: the image chosen in wp-admin → MQ Portal → System → Settings, else the
+	 * plugin's own file with ?ver= so browsers and caches fetch it again after each update.
+	 */
+	public static function logo( $which ) {
+		$which = isset( self::LOGOS[ $which ] ) ? $which : 'light';
+		$id    = (int) ( self::settings()[ 'logo_' . $which ] ?? 0 );
+		$src   = $id ? wp_get_attachment_image_src( $id, 'full' ) : false;
+		return $src ? $src[0] : self::default_logo( $which );
+	}
+
+	public static function default_logo( $which ) {
+		return MQP_URL . 'assets/' . self::LOGOS[ $which ][1] . '?ver=' . rawurlencode( MQP_VERSION );
+	}
+
+	/** All three, for the portal app and the print view. */
+	public static function logos() {
+		return array( 'light' => self::logo( 'light' ), 'color' => self::logo( 'color' ), 'mark' => self::logo( 'mark' ) );
 	}
 
 	/* ---------- Maintenance mode ---------- */
