@@ -1,0 +1,113 @@
+/* [mq_quote] — "Get Quotation" button and pop-up. Printed inline, so any theme or cache keeps the look. */
+.mqq, .mqq-modal {
+  --mqq-orange: #f88a35;
+  --mqq-orange-dark: #ea7620;
+  --mqq-navy: #1e3a8a;
+  --mqq-text: #111827;
+  --mqq-muted: #6b7280;
+  --mqq-line: #d1d5db;
+  box-sizing: border-box;
+  color: var(--mqq-text);
+  text-align: left;
+}
+.mqq *, .mqq *::before, .mqq *::after, .mqq-modal *, .mqq-modal *::before, .mqq-modal *::after { box-sizing: border-box; }
+.mqq[hidden], .mqq [hidden], .mqq-modal [hidden], .mqq-modal[hidden] { display: none !important; }
+.mqq-cta { margin: 0; }
+.mqq-open {
+  margin: 0; padding: 13px 28px; font: inherit; font-size: 1rem; font-weight: 700; line-height: 1.2; color: #fff;
+  background: linear-gradient(180deg, #fb9a4b, var(--mqq-orange-dark)); border: 0; border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(234, 118, 32, .3); cursor: pointer; text-transform: none; letter-spacing: normal;
+}
+.mqq-open:hover { color: #fff; transform: translateY(-1px); }
+
+.mqq-modal { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; padding: 16px; font-family: inherit; background: rgba(17, 24, 39, .55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+html.mqq-lock, html.mqq-lock body { overflow: hidden !important; }
+.mqq-box { position: relative; display: block; width: 100%; max-width: 640px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); margin: 0; padding: 26px 26px 22px; overflow-x: hidden; overflow-y: auto; background: #fff; border-radius: 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, .3); }
+.mqq-close { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 36px; height: 36px; margin: 0; padding: 0; font: inherit; font-size: 1.6rem; line-height: 1; color: #6b7280; background: #f3f4f6; border: 0; border-radius: 50%; box-shadow: none; cursor: pointer; z-index: 2; }
+.mqq-close:hover { background: #e5e7eb; color: var(--mqq-text); }
+.mqq-steps { display: flex; gap: 6px; margin: 0 44px 18px 0; font-size: .74rem; font-weight: 600; color: var(--mqq-muted); }
+.mqq-steps span { flex: 1; padding-top: 8px; border-top: 3px solid #e5e7eb; }
+.mqq-steps span.is-on { color: var(--mqq-navy); border-color: var(--mqq-orange); }
+.mqq-step { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.mqq-title { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.3; color: var(--mqq-text); }
+.mqq-sub { margin: -6px 0 0; color: var(--mqq-muted); font-size: .93rem; }
+.mqq-box label { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; font-size: .88rem; font-weight: 600; color: var(--mqq-text); }
+.mqq-box label em { color: #d92d20; font-style: normal; }
+.mqq-box label small { font-weight: 400; color: var(--mqq-muted); }
+.mqq-box input[type="text"], .mqq-box input[type="email"], .mqq-box input[type="tel"], .mqq-box input[type="date"], .mqq-box input[type="number"], .mqq-box input[type="search"], .mqq-box select, .mqq-box textarea {
+  width: 100%; min-height: 46px; margin: 0; padding: .65rem .85rem; font: inherit; font-size: 1rem; font-weight: 400; color: var(--mqq-text);
+  background: #fff; border: 1px solid var(--mqq-line); border-radius: 10px; box-shadow: none; outline: none;
+}
+.mqq-box textarea { min-height: 72px; resize: vertical; line-height: 1.5; }
+.mqq-box input:focus, .mqq-box select:focus, .mqq-box textarea:focus { border-color: var(--mqq-orange); box-shadow: 0 0 0 3px rgba(248, 138, 53, .22); }
+.mqq-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.mqq-hp { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
+
+/* Price list */
+.mqq-catalog { display: grid; gap: 8px; }
+.mqq-list { display: grid; gap: 6px; max-height: 300px; overflow-y: auto; padding: 2px; overscroll-behavior: contain; }
+.mqq-cat { margin: 6px 2px 0; font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mqq-muted); }
+.mqq-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #eceef2; border-radius: 12px; background: #fff; }
+.mqq-item.is-on { border-color: var(--mqq-orange); background: #fff8f2; }
+.mqq-item-name { flex: 1; min-width: 0; }
+.mqq-item-name strong { display: block; font-size: .93rem; font-weight: 600; overflow-wrap: anywhere; }
+.mqq-item-name small { color: var(--mqq-muted); font-size: .82rem; }
+.mqq-qty { flex: none; display: flex; align-items: center; gap: 4px; }
+.mqq-qty button { display: grid; place-items: center; width: 32px; height: 32px; margin: 0; padding: 0; font: inherit; font-size: 1.1rem; font-weight: 700; color: var(--mqq-navy); background: #eef2fb; border: 0; border-radius: 8px; box-shadow: none; cursor: pointer; }
+.mqq-qty button:hover { background: #dfe6f7; }
+.mqq-box .mqq-qty input { width: 64px; min-height: 34px; padding: 4px 6px; text-align: center; font-weight: 600; }
+.mqq-empty-list { margin: 0; padding: 12px; color: var(--mqq-muted); font-size: .9rem; background: #f9fafb; border-radius: 10px; }
+
+/* Custom work */
+.mqq-custom { display: grid; gap: 10px; padding: 14px; border: 1px dashed #f3b98a; border-radius: 14px; background: #fffaf5; }
+.mqq-custom-head strong { display: block; font-size: .95rem; }
+.mqq-custom-head small { color: var(--mqq-muted); font-size: .84rem; }
+.mqq-custom-list { display: grid; gap: 10px; }
+.mqq-crow { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; padding: 10px; background: #fff; border: 1px solid #eceef2; border-radius: 10px; }
+.mqq-crow textarea { grid-column: 1 / -1; min-height: 60px; }
+.mqq-crow-x { position: absolute; top: -9px; right: -9px; display: grid; place-items: center; width: 24px; height: 24px; margin: 0; padding: 0; font: inherit; font-size: 1rem; line-height: 1; color: #b42318; background: #fef3f2; border: 1px solid #fecdca; border-radius: 50%; cursor: pointer; }
+.mqq-add-custom { justify-self: start; margin: 0; padding: 8px 14px; font: inherit; font-size: .9rem; font-weight: 600; color: var(--mqq-orange-dark); background: #fff3e9; border: 0; border-radius: 8px; box-shadow: none; cursor: pointer; }
+.mqq-add-custom:hover { background: #ffe4cc; }
+.mqq-files input[type="file"] { max-width: 100%; font-size: .85rem; font-weight: 400; }
+
+/* Footer of a step */
+.mqq-sum { position: sticky; bottom: -22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 0 -26px -22px; padding: 14px 26px 18px; background: #fff; border-top: 1px solid #eceef2; }
+.mqq-sum-text { font-size: .92rem; font-weight: 600; }
+.mqq-next, .mqq-submit, .mqq-done-btn { margin: 0; padding: 12px 22px; font: inherit; font-size: 1rem; font-weight: 700; color: #fff; background: var(--mqq-orange); border: 0; border-radius: 10px; box-shadow: 0 6px 16px rgba(234, 118, 32, .28); cursor: pointer; text-transform: none; letter-spacing: normal; }
+.mqq-next:hover, .mqq-submit:hover, .mqq-done-btn:hover { background: var(--mqq-orange-dark); color: #fff; }
+.mqq-next:disabled, .mqq-submit:disabled { opacity: .6; cursor: default; }
+.mqq-actions { display: flex; justify-content: space-between; gap: 10px; }
+.mqq-back, .mqq-link { margin: 0; padding: 12px 18px; font: inherit; font-size: .95rem; font-weight: 600; color: var(--mqq-text); background: #f3f4f6; border: 0; border-radius: 10px; box-shadow: none; cursor: pointer; text-decoration: none; text-align: center; }
+.mqq-msg { margin: 0; font-size: .92rem; line-height: 1.5; overflow-wrap: anywhere; }
+.mqq-msg:empty { display: none; }
+.mqq-msg.is-error { padding: .7rem 1rem; color: #b42318; background: #fef3f2; border: 1px solid #fecdca; border-radius: 10px; }
+.mqq-box .cf-turnstile { max-width: 100%; overflow: hidden; }
+
+/* Result */
+.mqq-done { text-align: center; }
+.mqq-done-icon { display: grid; place-items: center; width: 66px; height: 66px; margin: 4px auto 0; border-radius: 50%; background: #ecfdf3; color: #079455; }
+.mqq-done-icon.is-wait { background: #fff4e5; color: #c2560c; }
+.mqq-done h3 { margin: 0; font-size: 1.4rem; }
+.mqq-done p { margin: 0; color: var(--mqq-muted); }
+.mqq-ref { display: inline-block; margin: 4px auto 0; padding: 8px 18px; border: 2px dashed var(--mqq-orange); border-radius: 10px; background: #fff8f2; font-weight: 800; letter-spacing: .04em; color: var(--mqq-orange-dark); }
+.mqq-table { width: 100%; border-collapse: collapse; text-align: left; font-size: .9rem; }
+.mqq-table td { padding: 8px 4px; border-bottom: 1px solid #eef0f4; vertical-align: top; }
+.mqq-table td:last-child { text-align: right; white-space: nowrap; }
+.mqq-table tr.is-total td { border-bottom: 0; padding-top: 12px; font-size: 1.05rem; font-weight: 800; color: var(--mqq-navy); }
+.mqq-tbp { color: #b45309; font-weight: 600; }
+.mqq-done-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+
+@media (max-width: 640px) {
+  .mqq-modal { align-items: flex-end; padding: 0; }
+  .mqq-box { max-width: none; max-height: 94vh; max-height: 94dvh; border-radius: 20px 20px 0 0; padding: 22px 16px 18px; }
+  .mqq-sum { margin: 0 -16px -18px; padding: 12px 16px 16px; bottom: -18px; }
+  .mqq-row { grid-template-columns: minmax(0, 1fr); }
+  .mqq-steps { font-size: .68rem; }
+  .mqq-list { max-height: 260px; }
+}
+
+/* Privacy consent (RA 10173) */
+.mqq-consent { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 10px; font-size: .88rem; line-height: 1.45; color: var(--mqq-muted); cursor: pointer; }
+.mqq-consent input { flex: none; width: 18px !important; height: 18px; margin: 1px 0 0 !important; padding: 0 !important; accent-color: var(--mqq-navy); }
+.mqq-consent span { display: inline !important; font-weight: 400 !important; color: inherit !important; }
+.mqq-consent a { color: var(--mqq-navy); text-decoration: underline; }

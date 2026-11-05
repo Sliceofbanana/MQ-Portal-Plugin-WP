@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+# Kept out of the plugin zip.
+.github export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore

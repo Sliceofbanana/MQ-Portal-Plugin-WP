@@ -1,0 +1,59 @@
+# Push a tag like v1.27.0 → this checks the code, builds mq-portal.zip and publishes a GitHub release.
+# Sites with MQ Portal then show "Update available" in wp-admin → Plugins.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: none
+
+      - name: Check PHP syntax
+        run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Check the version matches the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          HEADER=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9.]+' mq-portal.php)
+          CONST=$(grep -m1 -oP "define\(\s*'MQP_VERSION',\s*'\K[0-9.]+" mq-portal.php)
+          echo "tag=$TAG header=$HEADER constant=$CONST"
+          if [ "$TAG" != "$HEADER" ] || [ "$TAG" != "$CONST" ]; then
+            echo "::error::Tag v$TAG does not match the plugin version ($HEADER / $CONST). Bump both in mq-portal.php."
+            exit 1
+          fi
+
+      - name: Release notes from the changelog
+        # The changelog (includes/changelog.php) is keyed by the version without the "v".
+        run: |
+          export V="${GITHUB_REF_NAME#v}"
+          php -r 'define("ABSPATH", 1); $c = include "includes/changelog.php"; $v = getenv("V");
+            if (empty($c[$v])) { fwrite(STDERR, "No changelog entry for $v in includes/changelog.php\n"); exit(1); }
+            foreach ($c[$v]["items"] as $i) { echo "- " . $i . "\n"; }' > notes.md
+          cat notes.md
+
+      - name: Build mq-portal.zip
+        run: |
+          mkdir -p build/mq-portal
+          git archive HEAD | tar -x -C build/mq-portal
+          (cd build && zip -qr ../mq-portal.zip mq-portal)
+          unzip -l mq-portal.zip | tail -1
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MQ Portal ${{ github.ref_name }}
+          body_path: notes.md
+          files: mq-portal.zip

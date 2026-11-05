@@ -1,0 +1,7 @@
+# Build output and local junk — never commit customer data or zips.
+*.zip
+*.sql
+*.log
+.DS_Store
+Thumbs.db
+node_modules/

@@ -1,0 +1,52 @@
+/* [mq_print_collection] — only the photo carousel (the section's heading, text and button stay
+ * in Elementor), with click-to-enlarge. Printed inline, so it looks the same with any theme or
+ * caching plugin. --mqpc-per / -md / -sm and --mqpc-shape come from the gallery settings. */
+.mqpc, .mqpc-box {
+  --mqpc-orange: #f88a35;
+  --mqpc-blue: #1e3a8a;
+  box-sizing: border-box;
+}
+.mqpc *, .mqpc *::before, .mqpc *::after, .mqpc-box *, .mqpc-box *::before, .mqpc-box *::after { box-sizing: border-box; }
+.mqpc [hidden], .mqpc-box [hidden] { display: none !important; }
+.mqpc { width: 100%; max-width: 1440px; margin: 0 auto; }
+
+/* Arrows outside the photos on computers, swipe on phones */
+.mqpc-stage { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px; }
+.mqpc-track {
+  --mqpc-n: var(--mqpc-per, 4);
+  --mqpc-gap: 20px;
+  display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - (var(--mqpc-n) - 1) * var(--mqpc-gap)) / var(--mqpc-n));
+  gap: var(--mqpc-gap); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; overscroll-behavior-x: contain;
+}
+.mqpc-track::-webkit-scrollbar { display: none; }
+/* Each in its own column, so hidden arrows (few photos) don't move the photos. */
+.mqpc-prev { grid-column: 1; grid-row: 1; }
+.mqpc-track { grid-column: 2; grid-row: 1; }
+.mqpc-next { grid-column: 3; grid-row: 1; }
+.mqpc-track:focus-visible { outline: 2px solid var(--mqpc-blue); outline-offset: 4px; }
+.mqpc-item { display: block; scroll-snap-align: start; aspect-ratio: var(--mqpc-shape, 13 / 14); overflow: hidden; background: #f3f4f6; cursor: zoom-in; }
+.mqpc-item img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.mqpc-item:hover img { transform: scale(1.04); }
+.mqpc-arrow { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--mqpc-blue); cursor: pointer; justify-self: center; }
+.mqpc-arrow:hover { background: rgba(30, 58, 138, .08); }
+.mqpc-arrow:disabled { opacity: .25; cursor: default; background: transparent; }
+@media (max-width: 1024px) { .mqpc-track { --mqpc-n: var(--mqpc-per-md, 3); --mqpc-gap: 16px; } }
+@media (max-width: 768px) { .mqpc-track { --mqpc-n: var(--mqpc-per-sm, 2); --mqpc-gap: 12px; } }
+@media (max-width: 560px) {
+  .mqpc-stage { grid-template-columns: minmax(0, 1fr); }
+  .mqpc-arrow { display: none; }
+  .mqpc-track { grid-column: 1; --mqpc-gap: 10px; grid-auto-columns: 78%; padding: 0 16px; scroll-padding: 0 16px; }
+}
+
+/* Enlarged photo */
+.mqpc-box { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 56px 64px; background: rgba(10, 14, 22, .92); }
+.mqpc-box figure { margin: 0; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.mqpc-box img { display: block; max-width: 100%; max-height: calc(100vh - 150px); object-fit: contain; border-radius: 4px; background: #222; }
+.mqpc-box figcaption { color: #e5e7eb; font-size: .95rem; text-align: center; }
+.mqpc-box-count { position: absolute; top: 18px; left: 22px; color: #cbd5e1; font-size: .9rem; }
+.mqpc-box button { position: absolute; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #fff; cursor: pointer; }
+.mqpc-box button:hover { background: rgba(255, 255, 255, .2); }
+.mqpc-box .mqpc-x { top: 12px; right: 14px; }
+.mqpc-box .mqpc-bprev { left: 10px; top: 50%; transform: translateY(-50%); }
+.mqpc-box .mqpc-bnext { right: 10px; top: 50%; transform: translateY(-50%); }
+@media (max-width: 560px) { .mqpc-box { padding: 56px 8px; } .mqpc-box .mqpc-bprev, .mqpc-box .mqpc-bnext { top: auto; bottom: 14px; transform: none; } }

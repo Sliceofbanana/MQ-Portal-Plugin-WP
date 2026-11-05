@@ -1,0 +1,50 @@
+/* [mq_previous_orders] — Facebook posts featuring orders. Printed inline with the section, so it
+ * looks the same with any theme or caching plugin. Transparent around the cards. */
+.mqpo {
+  --mqpo-orange: #f88a35;
+  --mqpo-orange-dark: #ea7620;
+  --mqpo-blue: #1e3a8a;
+  --mqpo-text: #111827;
+  --mqpo-muted: #6b7280;
+  --mqpo-line: #eceef2;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--mqpo-text);
+  text-align: left;
+}
+.mqpo *, .mqpo *::before, .mqpo *::after { box-sizing: border-box; }
+.mqpo [hidden] { display: none !important; }
+.mqpo { padding: 48px 0; }
+.mqpo-head { max-width: 680px; margin: 0 auto 32px; text-align: center; }
+.mqpo-heading { margin: 0 0 10px; color: var(--mqpo-blue); font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 800; line-height: 1.2; }
+.mqpo-heading::after { content: ''; display: block; width: 56px; height: 4px; margin: 14px auto 0; border-radius: 4px; background: var(--mqpo-orange); }
+.mqpo-intro { margin: 0; color: var(--mqpo-muted); font-size: 1.02rem; line-height: 1.6; }
+@media (max-width: 640px) { .mqpo { padding: 32px 0; } .mqpo-head { margin-bottom: 22px; } }
+
+.mqpo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; }
+@media (max-width: 1024px) { .mqpo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } }
+@media (max-width: 640px) { .mqpo-grid { grid-template-columns: 1fr; gap: 16px; } }
+
+.mqpo-card { display: flex; flex-direction: column; overflow: hidden; background: #fff; border: 1px solid var(--mqpo-line); border-radius: 14px; box-shadow: 0 2px 10px rgba(17, 24, 39, .06); }
+.mqpo-pic { display: block; aspect-ratio: 1 / 1; overflow: hidden; background: #f3f4f6; }
+.mqpo-pic img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.mqpo-pic:hover img { transform: scale(1.03); }
+.mqpo-nopic { display: block; width: 100%; height: 100%; }
+.mqpo-body { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; flex: 1; }
+.mqpo-cap { margin: 0; font-size: .95rem; line-height: 1.55; color: var(--mqpo-text); overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+.mqpo-card.is-open .mqpo-cap { display: block; -webkit-line-clamp: unset; }
+.mqpo-more { align-self: flex-start; padding: 0; border: 0; background: none; color: var(--mqpo-blue); font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; }
+.mqpo-more:hover { text-decoration: underline; }
+.mqpo-link { margin-top: auto; color: var(--mqpo-orange-dark) !important; font-size: .88rem; font-weight: 600; text-decoration: none !important; }
+.mqpo-link:hover { text-decoration: underline !important; }
+
+.mqpo-cta { margin: 28px 0 0; text-align: center; }
+.mqpo-btn { display: inline-block; padding: 12px 26px; border-radius: 999px; background: var(--mqpo-orange); color: #fff !important; font-weight: 700; text-decoration: none !important; transition: background .2s; }
+.mqpo-btn:hover { background: var(--mqpo-orange-dark); }
+
+/* Facebook's own cards */
+.mqpo-fb .mqpo-grid { justify-items: center; }
+.mqpo-fbpost { width: 100%; max-width: 500px; overflow: hidden; }
+.mqpo-fbpost blockquote { margin: 0; padding: 18px; border: 1px solid var(--mqpo-line); border-radius: 12px; background: #fff; text-align: center; }

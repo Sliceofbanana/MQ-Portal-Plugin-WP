@@ -1,0 +1,20 @@
+/* [mq_prices] — the live price list (POS products marked "On the website"). Printed inline. */
+.mqpl { --mqpl-orange: #f88a35; --mqpl-orange-dark: #ea7620; --mqpl-navy: #1e3a8a; --mqpl-text: #111827; --mqpl-muted: #6b7280; box-sizing: border-box; width: 100%; max-width: 1200px; margin: 0 auto; color: var(--mqpl-text); text-align: left; }
+.mqpl *, .mqpl *::before, .mqpl *::after { box-sizing: border-box; }
+.mqpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 22px; }
+.mqpl-cat { min-width: 0; padding: 22px 22px 14px; background: #fff; border: 1px solid #f0f1f4; border-radius: 18px; box-shadow: 0 6px 22px rgba(17, 24, 39, .08); }
+.mqpl-cat h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: var(--mqpl-navy); }
+.mqpl-cat h3::before { content: ''; width: 6px; height: 20px; border-radius: 3px; background: var(--mqpl-orange); flex: none; }
+.mqpl-cat ul { margin: 0; padding: 0; list-style: none; }
+.mqpl-cat li { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin: 0; padding: 11px 0; border-top: 1px dashed #e5e7eb; }
+.mqpl-cat li:first-child { border-top: 0; }
+.mqpl-name { min-width: 0; font-size: .98rem; color: #374151; overflow-wrap: anywhere; }
+.mqpl-name small { display: block; font-size: .78rem; color: var(--mqpl-muted); }
+.mqpl-price { flex: none; white-space: nowrap; text-align: right; }
+.mqpl-price strong { font-size: 1.05rem; font-weight: 800; color: var(--mqpl-text); }
+.mqpl-price small { margin-left: 3px; font-size: .82rem; color: var(--mqpl-muted); }
+.mqpl-note { margin: 18px 0 0; text-align: center; font-size: .9rem; color: var(--mqpl-muted); }
+.mqpl-cta { display: flex; justify-content: center; margin: 18px 0 0; }
+.mqpl-btn { display: inline-block; padding: 13px 30px; font-size: 1rem; font-weight: 700; line-height: 1.2; color: #fff !important; text-decoration: none !important; background: linear-gradient(180deg, #fb9a4b, var(--mqpl-orange-dark)); border-radius: 10px; box-shadow: 0 8px 20px rgba(234, 118, 32, .3); transition: transform .15s, box-shadow .15s; }
+.mqpl-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(234, 118, 32, .38); }
+@media (max-width: 600px) { .mqpl-grid { gap: 14px; } .mqpl-cat { padding: 18px 16px 10px; border-radius: 14px; } }

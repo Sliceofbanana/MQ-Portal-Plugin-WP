@@ -1,0 +1,288 @@
+/* [mq_upload] — customer upload form.
+ * Step 1: a big orange upload box, transparent around it so it sits on the page's own panel.
+ * Step 2: once files are chosen, a pop-up with the files and the details form.
+ * Step 3: the same pop-up shows the reference number.
+ * ".mqp-up" marks both the form and the pop-up: the script moves the pop-up to the end of the
+ * page so see-through or blurred panels around the form can't trap it.
+ * Printed inline with the form, so it works even when themes or caching plugins skip stylesheets. */
+.mqp-up {
+  --mqp-orange: #f88a35;
+  --mqp-orange-dark: #ea7620;
+  --mqp-text: #111827;
+  --mqp-muted: #4b5563;
+  --mqp-line: #d1d5db;
+  color: var(--mqp-text);
+  text-align: left;
+  box-sizing: border-box;
+}
+.mqp-up *, .mqp-up *::before, .mqp-up *::after { box-sizing: border-box; }
+.mqp-up [hidden] { display: none !important; }
+
+form.mqp-upload { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; width: 100%; max-width: min(720px, 100%); min-width: 0; margin: 0; padding: 0; background: none; border: 0; font-family: inherit; }
+
+/* ---------- Step 1: the orange upload box ---------- */
+.mqp-up .mqp-drop {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 14px;
+  min-height: 300px;
+  background: var(--mqp-orange);
+  border: 0;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+.mqp-up .mqp-drop:hover { background: var(--mqp-orange-dark); box-shadow: 0 10px 28px rgba(234, 118, 32, .35); transform: translateY(-2px); }
+.mqp-up .mqp-drop:focus-within { outline: 3px solid rgba(30, 58, 138, .45); outline-offset: 3px; }
+.mqp-up .mqp-drop input[type="file"] { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.mqp-up .mqp-drop-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .7rem;
+  min-height: 272px;
+  height: 100%;
+  padding: 1.5rem 1rem;
+  border: 2.5px dashed rgba(255, 255, 255, .6);
+  border-radius: 16px;
+  color: #fff;
+  text-align: center;
+  transition: border-color .2s, background .2s;
+}
+.mqp-up .mqp-drop-inner svg { width: 46px; height: 46px; transition: transform .25s; }
+.mqp-up .mqp-drop:hover .mqp-drop-inner svg { transform: translateY(-4px); }
+.mqp-up .mqp-drop-inner strong { font-size: 1.3rem; font-weight: 700; line-height: 1.3; color: #fff; }
+.mqp-up .mqp-drop-inner small { font-size: .85rem; color: rgba(255, 255, 255, .88); }
+.mqp-up .mqp-drop.is-over { background: var(--mqp-orange-dark); }
+/* The smaller copy of the box inside the pop-up: shown until files are chosen. */
+.mqp-modal:not(.is-floating) .mqp-drop-mini { display: none; }
+.mqp-modal.has-files .mqp-drop-mini { display: none; }
+.mqp-up .mqp-drop-mini { min-height: 0; padding: 10px; border-radius: 18px; }
+.mqp-up .mqp-drop-mini:hover { transform: none; box-shadow: 0 8px 20px rgba(234, 118, 32, .3); }
+.mqp-up .mqp-drop-mini .mqp-drop-inner { min-height: 170px; gap: .5rem; padding: 1.25rem 1rem; border-radius: 13px; }
+.mqp-up .mqp-drop-mini .mqp-drop-inner svg { width: 38px; height: 38px; }
+.mqp-up .mqp-drop-mini .mqp-drop-inner strong { font-size: 1.12rem; }
+form.mqp-upload[hidden] { display: none !important; }
+.mqp-up .mqp-drop.is-over .mqp-drop-inner { border-color: #fff; border-style: solid; background: rgba(255, 255, 255, .1); }
+
+/* ---------- The pop-up (steps 2 and 3) ---------- */
+/* Without the script it simply shows under the box. */
+.mqp-modal { display: block; }
+.mqp-modal-box { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; min-width: 0; }
+.mqp-up .mqp-close { display: none; }
+form.mqp-upload.is-js .mqp-modal { display: none; }
+
+.mqp-modal.is-floating {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-family: inherit;
+  background: rgba(17, 24, 39, .55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.mqp-modal.is-floating.is-open { display: flex; animation: mqp-fade .2s ease both; }
+.mqp-modal.is-floating .mqp-modal-box {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1.75rem 1.5rem 1.5rem;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .3);
+  animation: mqp-pop .28s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+.mqp-modal.is-floating .mqp-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #6b7280;
+  background: #f3f4f6;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+}
+.mqp-modal.is-floating .mqp-close:hover { color: var(--mqp-text); background: #e5e7eb; }
+.mqp-up .mqp-details-title { margin: 0; padding-right: 2.5rem; font-size: 1.2rem; font-weight: 700; line-height: 1.35; color: var(--mqp-text); }
+html.mqp-lock, html.mqp-lock body { overflow: hidden !important; }
+
+/* Chosen files */
+.mqp-up .mqp-picked { min-width: 0; padding: .9rem 1rem; background: #f9fafb; border: 1px solid #eceef2; border-radius: 14px; }
+.mqp-up .mqp-picked-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .7rem; }
+.mqp-up .mqp-picked-count { font-size: .95rem; font-weight: 700; color: var(--mqp-text); }
+.mqp-up .mqp-add,
+.mqp-up .mqp-again {
+  margin: 0;
+  padding: .45rem .8rem;
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--mqp-orange-dark);
+  background: #fff3e9;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+.mqp-up .mqp-add:hover { background: #ffe4cc; }
+.mqp-up .mqp-file-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.mqp-up .mqp-file-list:empty { display: none; }
+.mqp-up .mqp-file-list li { display: flex; align-items: center; gap: .75rem; margin: 0; padding: .55rem .65rem; background: #fff; border: 1px solid #eceef2; border-radius: 10px; }
+.mqp-up .mqp-file-icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: #fff3e9; color: var(--mqp-orange-dark); font-size: .68rem; font-weight: 800; letter-spacing: .02em; }
+.mqp-up .mqp-file-name { flex: 1; min-width: 0; }
+.mqp-up .mqp-file-name strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .93rem; font-weight: 600; }
+.mqp-up .mqp-file-name small { color: var(--mqp-muted); font-size: .8rem; }
+.mqp-up .mqp-file-remove {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #6b7280;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.mqp-up .mqp-file-remove:hover { color: #b42318; background: #fef3f2; }
+
+/* Details form */
+.mqp-up .mqp-details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; min-width: 0; }
+.mqp-up .mqp-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.mqp-up label:not(.mqp-drop) { display: flex; flex-direction: column; min-width: 0; gap: .4rem; margin: 0; font-size: .9rem; font-weight: 600; color: var(--mqp-text); }
+.mqp-up label em { color: #d92d20; font-style: normal; }
+.mqp-up label small { font-weight: 400; color: var(--mqp-muted); }
+.mqp-up input[type="text"],
+.mqp-up input[type="tel"],
+.mqp-up input[type="email"],
+.mqp-up select,
+.mqp-up textarea {
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  padding: .75rem .9rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--mqp-text);
+  background: #fff;
+  border: 1px solid var(--mqp-line);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.mqp-up textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+.mqp-up select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .8rem center;
+  cursor: pointer;
+}
+.mqp-up input::placeholder, .mqp-up textarea::placeholder { color: #9ca3af; }
+.mqp-up input:focus, .mqp-up select:focus, .mqp-up textarea:focus { border-color: var(--mqp-orange); box-shadow: 0 0 0 3px rgba(248, 138, 53, .22); }
+.mqp-up .mqp-hp { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
+.mqp-up .cf-turnstile { max-width: 100%; overflow: hidden; }
+.mqp-up .mqp-msg, .mqp-up .mqp-sent, .mqp-up .mqp-sent-ref { max-width: 100%; overflow-wrap: anywhere; }
+
+.mqp-up .mqp-submit {
+  width: 100%;
+  height: 54px;
+  margin: .25rem 0 0;
+  padding: 0 1.25rem;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--mqp-orange);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(234, 118, 32, .3);
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.mqp-up .mqp-submit:hover { background: var(--mqp-orange-dark); transform: translateY(-1px); }
+.mqp-up .mqp-submit:disabled { opacity: .7; cursor: wait; transform: none; }
+.mqp-up .mqp-progress { height: 8px; background: rgba(17, 24, 39, .1); border-radius: 99px; overflow: hidden; }
+.mqp-up .mqp-progress > div { height: 100%; width: 0; background: var(--mqp-orange); transition: width .2s; }
+
+/* Messages */
+.mqp-up .mqp-msg { margin: 0; font-size: .95rem; line-height: 1.5; }
+.mqp-up .mqp-msg:empty { display: none; }
+.mqp-up .mqp-msg.is-error { padding: .8rem 1rem; color: #b42318; background: #fef3f2; border: 1px solid #fecdca; border-radius: 10px; }
+.mqp-up .mqp-msg.is-ok { padding: .8rem 1rem; color: #067647; background: #ecfdf3; border: 1px solid #abefc6; border-radius: 10px; font-weight: 600; }
+
+/* Step 3: reference number, in the same pop-up */
+.mqp-modal.is-sent .mqp-modal-box > :not(.mqp-sent):not(.mqp-close) { display: none !important; }
+.mqp-up .mqp-sent { display: flex; flex-direction: column; align-items: center; gap: .5rem; padding: 1rem .5rem .5rem; text-align: center; animation: mqp-pop .3s ease both; }
+.mqp-up .mqp-sent-icon { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: .25rem; border-radius: 50%; background: #ecfdf3; color: #079455; }
+.mqp-up .mqp-sent > strong { font-size: 1.4rem; font-weight: 700; }
+.mqp-up .mqp-sent p { margin: 0; color: var(--mqp-muted); }
+.mqp-up .mqp-sent-ref {
+  margin-top: .5rem !important;
+  padding: .9rem 1.4rem;
+  font-size: .95rem;
+  color: var(--mqp-text) !important;
+  background: #fff8f2;
+  border: 2px dashed var(--mqp-orange);
+  border-radius: 12px;
+}
+.mqp-up .mqp-sent-ref b { display: block; margin-top: .15rem; font-size: 1.6rem; font-weight: 800; letter-spacing: .06em; color: var(--mqp-orange-dark); }
+.mqp-up .mqp-sent small { color: var(--mqp-muted); font-size: .82rem; }
+.mqp-up .mqp-again { margin-top: .75rem; padding: .7rem 2rem; font-size: .95rem; color: #fff; background: var(--mqp-orange); }
+.mqp-up .mqp-again:hover { background: var(--mqp-orange-dark); }
+
+@keyframes mqp-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mqp-pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .mqp-up, .mqp-up * { animation: none !important; transition: none !important; } }
+
+@media (max-width: 600px) {
+  .mqp-up .mqp-drop { min-height: 230px; border-radius: 18px; }
+  .mqp-up .mqp-drop-inner { min-height: 202px; }
+  .mqp-up .mqp-drop-mini { min-height: 0; }
+  .mqp-up .mqp-drop-mini .mqp-drop-inner { min-height: 140px; }
+  .mqp-up .mqp-drop-inner strong { font-size: 1.12rem; }
+  .mqp-up .mqp-row { grid-template-columns: 1fr; }
+  /* On phones the pop-up slides up from the bottom. */
+  .mqp-modal.is-floating { align-items: flex-end; padding: 0; }
+  .mqp-modal.is-floating .mqp-modal-box { max-width: none; max-height: 92vh; max-height: 92dvh; border-radius: 20px 20px 0 0; padding: 1.5rem 1.1rem 1.25rem; }
+}
+
+/* Privacy consent (RA 10173) */
+.mqp-consent { display: flex !important; align-items: flex-start; gap: 10px; margin: 2px 0 0; font-size: .88rem; line-height: 1.45; color: #4b5563; font-weight: 400; cursor: pointer; }
+.mqp-consent input { flex: none; width: 18px !important; height: 18px; margin: 1px 0 0 !important; accent-color: #1e3a8a; }
+.mqp-consent a { color: #1e3a8a; text-decoration: underline; }
+.mqp-up .mqp-drop-inner small.mqp-drop-types { line-height: 1.6; font-size: .9rem; }
