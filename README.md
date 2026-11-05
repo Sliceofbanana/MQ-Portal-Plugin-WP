@@ -429,5 +429,12 @@ Every update raises the version number (`MQ Portal x.y.z` on the Plugins page) a
 
 ## 10. Updating and removing
 
-- **Updating:** upload a newer zip the same way. WordPress asks to replace the plugin, and your data stays.
+- **Updating (1.27.0 and later):** wp-admin → Plugins shows **Update available** under MQ Portal when a newer release is on GitHub ([Sliceofbanana/MQ-Portal-Plugin-WP](https://github.com/Sliceofbanana/MQ-Portal-Plugin-WP/releases)). Click **Update now**, or **Enable auto-updates** once. **Check for updates** under MQ Portal asks GitHub right away (otherwise WordPress checks about twice a day). Your data stays.
+  - Private repository: add `define( 'MQP_GITHUB_TOKEN', 'github_pat_…' );` to `wp-config.php` (a fine-grained token with read-only **Contents** access to this repository).
+  - Older versions: upload the zip once (Plugins → Add New → Upload → Replace current with uploaded); after that, updates come from GitHub.
+- **Releasing a new version (developer):**
+  1. Make the changes, bump `Version:` and `MQP_VERSION` in `mq-portal.php`, and add the version to `includes/changelog.php` (the release notes come from it).
+  2. Commit and push: `git commit -am "1.27.1: …"` then `git push`.
+  3. Tag it: `git tag v1.27.1` then `git push origin v1.27.1`.
+  4. GitHub → Actions builds `mq-portal.zip` and publishes the release (it stops if the tag and the version in `mq-portal.php` differ, a PHP file has a syntax error, or the changelog has no entry). The sites see the update within 12 hours, or at once with **Check for updates**.
 - **Removing:** deactivating or deleting the plugin does **not** delete any data.
