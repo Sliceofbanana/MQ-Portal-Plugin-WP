@@ -6,6 +6,13 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.31.3' => array(
+		'date'  => '2026-11-09',
+		'items' => array(
+			'Ready for delivery: the message and the email subject now use the number the customer knows: the online order number (MQ-...), or the invoice number for walk-in orders, instead of the internal job order number (JO-...).',
+			'Fixed: Send email (new in 1.31.0) saved the customer\'s email address as the job\'s stage. With a long address the email went out but staff got "no longer at that step" and nothing was recorded (the database error in Problems). With a short address the job disappeared from the boards. Send email now works properly, and affected jobs return to Ready for delivery automatically when you update.',
+		),
+	),
 	'1.31.2' => array(
 		'date'  => '2026-11-06',
 		'items' => array(

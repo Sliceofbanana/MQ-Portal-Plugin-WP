@@ -82,7 +82,7 @@ class MQP_Order {
 			// Last line on the Pick up and courier choices on the order page (owner, 2026-11-06).
 			'pickup_hint'   => 'Message us via Facebook Page for pick up time.',
 			'courier_hint'  => 'Inform the rider to call 09205177884 when arrived at our location.',
-			// Message staff copy when an order is ready. {name} = customer, {order} = job order number.
+			// Message staff copy when an order is ready. {name} = customer, {order} = the customer's order number (online order number, else invoice number).
 			'ready_message' => 'Hi {name}! This is MQ Prints. Your order {order} is now ready for delivery. Daghang salamat!',
 			// Pick up: one place for now (more can come back later as a list).
 			'pickup'        => array(

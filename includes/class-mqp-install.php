@@ -88,6 +88,13 @@ class MQP_Install {
 			// it at the bottom of the order page. The shop's address replaces it everywhere it was saved.
 			self::replace_email( 'genesis.esdrilonjr@gmail.com', 'info@mqprintsph.com' );
 		}
+		if ( $old && $old < 18 ) {
+			// 1.31.0–1.31.2: Send email saved the customer's address as the job's stage, which hid the job from every board.
+			// Only jobs in Ready for delivery had that button, so that is where they go back to.
+			global $wpdb;
+			$wpdb->query( 'UPDATE ' . mqp_table( 'jobs' ) . " SET stage = 'ready' WHERE stage LIKE '%@%'" );
+			$wpdb->query( 'UPDATE ' . mqp_table( 'job_events' ) . " SET to_stage = '' WHERE to_stage LIKE '%@%'" );
+		}
 		if ( $old && $old < 17 ) {
 			// 1.26.0: online orders take files up to 100 MB each (the owner's request); a saved 50 follows.
 			$s = get_option( MQP_Settings::OPTION, array() );

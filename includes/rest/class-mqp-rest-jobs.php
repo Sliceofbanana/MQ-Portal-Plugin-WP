@@ -183,7 +183,9 @@ class MQP_REST_Jobs {
 		if ( 'ready' === $job['stage'] && current_user_can( 'mq_deliver' ) ) {
 			// How to reach the customer, and a ready-made "order ready" message staff copy or email.
 			$job['contact']       = self::contact( $id, (int) $row['document_id'] );
-			$job['ready_message'] = MQP_Order::ready_message( '' !== $job['contact']['name'] ? $job['contact']['name'] : $job['customer_name'], $job['number'] );
+			// The number the customer knows: the online order number, else the invoice number (never the internal JO- number).
+			$job['order_ref']     = '' !== $job['contact']['reference'] ? $job['contact']['reference'] : ( ! empty( $job['invoice_number'] ) ? $job['invoice_number'] : $job['number'] );
+			$job['ready_message'] = MQP_Order::ready_message( '' !== $job['contact']['name'] ? $job['contact']['name'] : $job['customer_name'], $job['order_ref'] );
 		}
 		if ( ! self::sees_prices() ) {
 			// Creatives/production don't need prices.
@@ -201,7 +203,7 @@ class MQP_REST_Jobs {
 	public static function contact( $job_id, $document_id ) {
 		global $wpdb;
 		$doc   = $wpdb->get_row( $wpdb->prepare( 'SELECT customer_id, customer_name, customer_contact FROM ' . mqp_table( 'documents' ) . ' WHERE id = %d', $document_id ), ARRAY_A );
-		$order = $wpdb->get_row( $wpdb->prepare( 'SELECT id, customer_name, customer_phone, customer_email, delivery_type, delivery_location FROM ' . mqp_table( 'orders' ) . ' WHERE job_id = %d ORDER BY id DESC LIMIT 1', $job_id ), ARRAY_A );
+		$order = $wpdb->get_row( $wpdb->prepare( 'SELECT id, reference, customer_name, customer_phone, customer_email, delivery_type, delivery_location FROM ' . mqp_table( 'orders' ) . ' WHERE job_id = %d ORDER BY id DESC LIMIT 1', $job_id ), ARRAY_A );
 		$email = $doc && $doc['customer_id'] ? (string) $wpdb->get_var( $wpdb->prepare( 'SELECT email FROM ' . mqp_table( 'customers' ) . ' WHERE id = %d', $doc['customer_id'] ) ) : '';
 		$out   = array(
 			'name'     => trim( (string) ( $doc['customer_name'] ?? '' ) ),
@@ -209,6 +211,7 @@ class MQP_REST_Jobs {
 			'email'    => trim( $email ),
 			'delivery' => '',
 			'online'   => (bool) $order,
+			'reference' => $order ? (string) $order['reference'] : '',
 		);
 		if ( $order ) {
 			$out['name']  = '' !== $out['name'] ? $out['name'] : trim( $order['customer_name'] );
@@ -491,9 +494,9 @@ class MQP_REST_Jobs {
 				break;
 			case 'email_ready':
 				// Emails the "order ready" message (as edited by staff) and records it as the notification.
-				$to      = $job['contact']['email'] ?? '';
-				$message = trim( sanitize_textarea_field( (string) $req->get_param( 'message' ) ) );
-				if ( '' === $to ) {
+				$recipient = $job['contact']['email'] ?? ''; // Not $to: that is the stage this action moves the job to.
+				$message   = trim( sanitize_textarea_field( (string) $req->get_param( 'message' ) ) );
+				if ( '' === $recipient ) {
 					return MQP_REST::error( 'This customer has no email address on file.' );
 				}
 				if ( '' === $message ) {
@@ -502,12 +505,12 @@ class MQP_REST_Jobs {
 				$order  = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . mqp_table( 'orders' ) . ' WHERE job_id = %d ORDER BY id DESC LIMIT 1', $id ) );
 				$order  = $order ? MQP_Order::load( (int) $order ) : null;
 				$button = $order ? array( 'Track my order', MQP_Order::track_link( $order ) ) : null;
-				if ( ! MQP_Mail::send( $to, 'Your order ' . $job['number'] . ' is ready', 'Your order is ready', array( $message ), $button ) ) {
+				if ( ! MQP_Mail::send( $recipient, 'Your order ' . $job['order_ref'] . ' is ready', 'Your order is ready', array( $message ), $button ) ) {
 					return MQP_REST::error( 'The email could not be sent. Check the site\'s email settings, or notify the customer another way.', 500 );
 				}
 				$update['notified_at']  = mqp_now();
 				$update['notified_via'] = 'Email';
-				$note                   = 'Customer notified via Email (sent from the portal to ' . $to . ")\n" . $message;
+				$note                   = 'Customer notified via Email (sent from the portal to ' . $recipient . ")\n" . $message;
 				break;
 			case 'delivered':
 				$update['delivered_at'] = mqp_now();
