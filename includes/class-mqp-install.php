@@ -6,6 +6,7 @@ class MQP_Install {
 	public static function activate() {
 		self::create_tables();
 		MQP_Roles::install();
+		MQP_Roles::migrate_legacy_roles();
 		self::seed();
 		MQP_Files::protect_dir();
 		MQP_Portal::add_rewrite();
@@ -94,6 +95,14 @@ class MQP_Install {
 			global $wpdb;
 			$wpdb->query( 'UPDATE ' . mqp_table( 'jobs' ) . " SET stage = 'ready' WHERE stage LIKE '%@%'" );
 			$wpdb->query( 'UPDATE ' . mqp_table( 'job_events' ) . " SET to_stage = '' WHERE to_stage LIKE '%@%'" );
+		}
+		if ( $old && $old < 19 ) {
+			// 1.31.4: the Production role was renamed (its old name clashed with the "mq_production" permission,
+			// so saving Access erased the role and the account vanished from Staff). Restores those accounts.
+			$n = MQP_Roles::migrate_legacy_roles();
+			if ( $n ) {
+				mqp_log( 'users_repaired', array( 'reason' => $n . ' Production staff account(s) moved to the renamed role or given their role back' ) );
+			}
 		}
 		if ( $old && $old < 17 ) {
 			// 1.26.0: online orders take files up to 100 MB each (the owner's request); a saved 50 follows.

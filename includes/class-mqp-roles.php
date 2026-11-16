@@ -50,7 +50,9 @@ class MQP_Roles {
 				'name' => 'MQ Creatives',
 				'caps' => array( 'mq_access_portal', 'mq_creatives', 'mq_view_board' ),
 			),
-			'mq_production'    => array(
+			// The slug must never equal a capability name: WordPress keeps roles and per-user caps in
+			// one list, so resetting the "mq_production" cap used to erase the role (1.31.4).
+			'mq_production_staff' => array(
 				'name' => 'MQ Production',
 				'caps' => array( 'mq_access_portal', 'mq_production', 'mq_view_board' ),
 			),
@@ -77,7 +79,13 @@ class MQP_Roles {
 		);
 	}
 
+	/** Old role slugs that clashed with a capability of the same name. */
+	const LEGACY_ROLES = array( 'mq_production' => 'mq_production_staff' );
+
 	public static function install() {
+		foreach ( array_keys( self::LEGACY_ROLES ) as $old ) {
+			remove_role( $old );
+		}
 		foreach ( self::roles() as $slug => $role ) {
 			remove_role( $slug );
 			$caps = array( 'read' => true );
@@ -94,7 +102,65 @@ class MQP_Roles {
 		}
 	}
 
+	/**
+	 * 1.31.4: moves Production staff to the new role slug and gives the role back to portal staff
+	 * who lost it (saving Access reset the "mq_production" cap, which erased the old role).
+	 * Returns how many accounts were repaired.
+	 */
+	public static function migrate_legacy_roles() {
+		global $wpdb;
+		$key   = $wpdb->get_blog_prefix() . 'capabilities';
+		$roles = self::roles();
+		$fixed = 0;
+		foreach ( get_users( array( 'fields' => 'ID' ) ) as $uid ) {
+			$caps = get_user_meta( (int) $uid, $key, true );
+			$caps = is_array( $caps ) ? $caps : array();
+			if ( ! empty( $caps['administrator'] ) ) {
+				continue;
+			}
+			$has_role = false;
+			foreach ( $roles as $slug => $_ ) {
+				if ( ! empty( $caps[ $slug ] ) ) {
+					$has_role = true;
+				}
+			}
+			$changed = false;
+			foreach ( self::LEGACY_ROLES as $old => $new ) {
+				if ( array_key_exists( $old, $caps ) && ! $has_role ) {
+					// Was their role. A "false" stays as a per-user deny of that capability.
+					if ( $caps[ $old ] ) {
+						unset( $caps[ $old ] );
+					}
+					$caps[ $new ] = true;
+					$has_role     = true;
+					$changed      = true;
+				}
+				// With another portal role, the old key is a per-user grant/deny of the capability: left as is.
+			}
+			// A portal staff account (created in Staff or from a sign-up) with no role left lost it to the bug.
+			// Only the Production role could be erased that way.
+			if ( ! $has_role && metadata_exists( 'user', (int) $uid, 'mqp_branch_id' ) ) {
+				$caps['mq_production_staff'] = true;
+				$changed                     = true;
+			}
+			if ( $changed ) {
+				update_user_meta( (int) $uid, $key, $caps );
+				clean_user_cache( (int) $uid );
+				$u = get_userdata( (int) $uid );
+				if ( $u ) {
+					$u->update_user_level_from_caps();
+				}
+				$fixed++;
+			}
+		}
+		$wpdb->query( $wpdb->prepare( 'UPDATE ' . mqp_table( 'signups' ) . ' SET role = %s WHERE role = %s', 'mq_production_staff', 'mq_production' ) ); // phpcs:ignore WordPress.DB.PreparedSQL
+		return $fixed;
+	}
+
 	public static function uninstall() {
+		foreach ( array_keys( self::LEGACY_ROLES ) as $old ) {
+			remove_role( $old );
+		}
 		foreach ( array_keys( self::roles() ) as $slug ) {
 			remove_role( $slug );
 		}

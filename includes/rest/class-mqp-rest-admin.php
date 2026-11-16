@@ -433,6 +433,7 @@ class MQP_REST_Admin {
 	public static function save_user( WP_REST_Request $req ) {
 		$p    = $req->get_json_params();
 		$role = sanitize_key( (string) ( $p['role'] ?? '' ) );
+		$role = MQP_Roles::LEGACY_ROLES[ $role ] ?? $role; // a page opened before 1.31.4 still sends the old name
 		if ( ! isset( MQP_Roles::roles()[ $role ] ) ) {
 			return MQP_REST::error( 'Choose a role.' );
 		}
@@ -606,7 +607,8 @@ class MQP_REST_Admin {
 		}
 		$known = MQP_Roles::capabilities();
 		foreach ( (array) $req->get_json_params() as $cap => $mode ) {
-			if ( ! isset( $known[ $cap ] ) ) {
+			// Never touch a key that is also a role name: that would add or erase a role, not a permission.
+			if ( ! isset( $known[ $cap ] ) || isset( MQP_Roles::roles()[ $cap ] ) ) {
 				continue;
 			}
 			if ( 'mq_manage' === $cap && ! current_user_can( 'manage_options' ) ) {

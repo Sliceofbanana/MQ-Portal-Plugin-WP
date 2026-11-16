@@ -6,6 +6,12 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.31.4' => array(
+		'date'  => '2026-11-17',
+		'items' => array(
+			'Fixed: a new MQ Production account disappeared from Admin → Staff right after its access was saved, and adding it again said the username was already used. The Production role had the same name as the "Open the Production tab" permission, so saving Access erased the role. The role is renamed, and accounts that lost it get the MQ Production role back automatically when you update (check their Access settings afterwards).',
+		),
+	),
 	'1.31.3' => array(
 		'date'  => '2026-11-09',
 		'items' => array(

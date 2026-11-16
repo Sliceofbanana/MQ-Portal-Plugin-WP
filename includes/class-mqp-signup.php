@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 class MQP_Signup {
 
 	/** Positions staff may ask for. The admin can change it when approving. */
-	const REQUESTABLE = array( 'mq_sales_staff', 'mq_artist', 'mq_production', 'mq_qc_officer', 'mq_cashier', 'mq_finance_ops' );
+	const REQUESTABLE = array( 'mq_sales_staff', 'mq_artist', 'mq_production_staff', 'mq_qc_officer', 'mq_cashier', 'mq_finance_ops' );
 
 	public static function routes() {
 		$ns = MQP_REST::NS;
@@ -177,6 +177,7 @@ class MQP_Signup {
 			return MQP_REST::error( 'This request was already ' . $s['status'] . '.' );
 		}
 		$role = sanitize_key( (string) ( $req->get_param( 'role' ) ?: $s['role'] ) );
+		$role = MQP_Roles::LEGACY_ROLES[ $role ] ?? $role;
 		if ( ! isset( MQP_Roles::roles()[ $role ] ) ) {
 			return MQP_REST::error( 'Choose a position.' );
 		}
