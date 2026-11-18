@@ -117,6 +117,21 @@ class MQP_System {
 			case 'seen':
 				$wpdb->query( 'UPDATE ' . mqp_table( 'errors' ) . ' SET seen = 1' );
 				break;
+			case 'resolve':
+			case 'unresolve':
+				// Resolved: fixed, so it no longer counts in Health. It opens again by itself if it happens again.
+				$id = (int) ( $_REQUEST['id'] ?? 0 );
+				$wpdb->query( $wpdb->prepare( 'UPDATE ' . mqp_table( 'errors' ) . ' SET seen = 1, resolved_at = ' . ( 'resolve' === $op ? '%s' : 'NULL' ) . ' WHERE id = %d', ...( 'resolve' === $op ? array( mqp_now(), $id ) : array( $id ) ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL
+				MQP_Monitor::log( 'system', ( 'resolve' === $op ? 'Marked a problem as resolved: ' : 'Opened a problem again: ' ) . (string) $wpdb->get_var( $wpdb->prepare( 'SELECT message FROM ' . mqp_table( 'errors' ) . ' WHERE id = %d', $id ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL
+				if ( ! empty( $_REQUEST['back'] ) ) {
+					wp_safe_redirect( MQP_Dev_Admin::url( array( 'done' => $op ) ) . '#problems' );
+					exit;
+				}
+				break;
+			case 'resolve_all':
+				$wpdb->query( $wpdb->prepare( 'UPDATE ' . mqp_table( 'errors' ) . ' SET seen = 1, resolved_at = %s WHERE resolved_at IS NULL', mqp_now() ) ); // phpcs:ignore WordPress.DB.PreparedSQL
+				MQP_Monitor::log( 'system', 'Marked every problem as resolved' );
+				break;
 			case 'clear_errors':
 				$wpdb->query( 'DELETE FROM ' . mqp_table( 'errors' ) );
 				MQP_Monitor::log( 'system', 'Cleared the problem list' );
@@ -196,6 +211,9 @@ class MQP_System {
 			'daily'             => array( 'success', 'The daily job ran.' ),
 			'recheck'           => array( 'success', 'Checked again. The health report was emailed to the site admin.' ),
 			'seen'              => array( 'success', 'All problems marked as read.' ),
+			'resolve'           => array( 'success', 'Marked as resolved. It no longer counts in Health, and opens again by itself if it happens again.' ),
+			'unresolve'         => array( 'success', 'The problem is open again.' ),
+			'resolve_all'       => array( 'success', 'Every problem is marked as resolved.' ),
 			'clear_errors'      => array( 'success', 'The problem list is cleared.' ),
 			'clear_lockouts'    => array( 'success', 'All locked logins are unlocked.' ),
 			'clear_limits'      => array( 'success', 'Order, upload and account-request limits are cleared.' ),
@@ -259,19 +277,24 @@ class MQP_System {
 
 	private static function tab_errors() {
 		global $wpdb;
-		$rows = $wpdb->get_results( 'SELECT * FROM ' . mqp_table( 'errors' ) . ' ORDER BY seen ASC, last_seen DESC LIMIT 200', ARRAY_A );
-		echo '<p class="mqp-intro">Things that went wrong in the portal, the order page or emails. The same problem shows once with a count. You get an email alert when a new one happens (see Settings).</p>';
+		$rows = $wpdb->get_results( 'SELECT * FROM ' . mqp_table( 'errors' ) . ' ORDER BY (resolved_at IS NOT NULL) ASC, seen ASC, last_seen DESC LIMIT 200', ARRAY_A );
+		echo '<p class="mqp-intro">Things that went wrong in the portal, the order page or emails. The same problem shows once with a count. You get an email alert when a new one happens (see Settings). Click <strong>Resolved</strong> once a problem is fixed: it stops counting in Health, and opens again by itself if it happens again.</p>';
 		if ( ! $rows ) {
 			echo '<div class="mqp-card mqp-empty"><span class="dashicons dashicons-yes-alt"></span><p><strong>No problems recorded.</strong></p></div>';
 			return;
 		}
 		echo '<p class="mqp-actions">';
 		self::button( 'seen', 'errors', 'Mark all as read' );
+		self::button( 'resolve_all', 'errors', 'Mark all as resolved', false, 'Mark every problem as resolved? Each one opens again by itself if it happens again.' );
 		self::button( 'clear_errors', 'errors', 'Clear list', false, 'Remove every problem from the list?' );
-		echo '</p><table class="widefat striped mqp-errors"><thead><tr><th>Last seen</th><th>Type</th><th>Problem</th><th>Page / request</th><th>Times</th></tr></thead><tbody>';
+		echo '</p><table class="widefat striped mqp-errors"><thead><tr><th>Last seen</th><th>Type</th><th>Problem</th><th>Page / request</th><th>Times</th><th>Status</th></tr></thead><tbody>';
 		foreach ( $rows as $r ) {
 			$user = $r['user_id'] ? get_userdata( (int) $r['user_id'] ) : null;
-			echo '<tr class="' . ( $r['seen'] ? '' : 'is-new' ) . '">';
+			$done = ! empty( $r['resolved_at'] );
+			$cell = $done
+				? '<span class="mqp-pill is-ok">Resolved</span><br><span class="description">' . esc_html( mysql2date( 'M j, g:i A', $r['resolved_at'] ) ) . '</span><br><a href="' . esc_url( add_query_arg( 'id', (int) $r['id'], self::action_url( 'unresolve', 'errors' ) ) ) . '">Open again</a>'
+				: '<a class="button button-small button-primary" href="' . esc_url( add_query_arg( 'id', (int) $r['id'], self::action_url( 'resolve', 'errors' ) ) ) . '">Resolved</a>';
+			echo '<tr class="' . ( $done ? 'is-resolved' : ( $r['seen'] ? '' : 'is-new' ) ) . '">';
 			echo '<td>' . esc_html( mysql2date( 'M j, g:i A', $r['last_seen'] ) ) . ( $r['seen'] ? '' : ' <span class="mqp-new">New</span>' ) . '</td>';
 			echo '<td>' . esc_html( MQP_Monitor::KINDS[ $r['kind'] ] ?? $r['kind'] ) . '</td>';
 			echo '<td><strong>' . esc_html( $r['message'] ) . '</strong>';
@@ -279,7 +302,7 @@ class MQP_System {
 				echo '<details><summary>Details</summary><pre>' . esc_html( $r['detail'] ) . '</pre></details>';
 			}
 			echo '</td><td>' . esc_html( $r['url'] ) . ( $user ? '<br><span class="description">' . esc_html( $user->display_name ) . '</span>' : '' ) . '</td>';
-			echo '<td>' . (int) $r['hits'] . ( (int) $r['hits'] > 1 ? '<br><span class="description">since ' . esc_html( mysql2date( 'M j', $r['first_seen'] ) ) . '</span>' : '' ) . '</td></tr>';
+			echo '<td>' . (int) $r['hits'] . ( (int) $r['hits'] > 1 ? '<br><span class="description">since ' . esc_html( mysql2date( 'M j', $r['first_seen'] ) ) . '</span>' : '' ) . '</td><td>' . $cell . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 		echo '</tbody></table>';
 		$wpdb->query( 'UPDATE ' . mqp_table( 'errors' ) . ' SET seen = 1 WHERE seen = 0' );
@@ -981,6 +1004,7 @@ class MQP_System {
 .mqp-sys .mqp-count{display:inline-block;background:#d63638;color:#fff;border-radius:9px;font-size:11px;line-height:17px;min-width:17px;padding:0 5px;text-align:center;margin-left:4px}
 .mqp-sys .mqp-empty{text-align:center;padding:32px}.mqp-sys .mqp-empty .dashicons{color:#00a32a;font-size:36px;width:36px;height:36px}
 .mqp-sys .mqp-errors tr.is-new td{background:#fffdf3}
+.mqp-sys .mqp-errors tr.is-resolved td{opacity:.65}.mqp-sys .mqp-errors tr.is-resolved td:last-child{opacity:1}
 .mqp-sys .mqp-new{background:#d63638;color:#fff;font-size:10px;border-radius:3px;padding:1px 5px;font-weight:600}
 .mqp-sys .mqp-errors pre{white-space:pre-wrap;word-break:break-word;background:#f6f7f7;padding:10px;max-height:260px;overflow:auto;font-size:12px}
 .mqp-sys .mqp-errors summary{cursor:pointer;color:#2271b1;margin-top:4px}

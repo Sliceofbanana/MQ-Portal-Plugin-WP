@@ -269,7 +269,7 @@ class MQP_Monitor {
 				$wpdb->prepare(
 					'INSERT INTO ' . mqp_table( 'errors' ) . ' (hash, kind, message, detail, url, user_id, hits, seen, first_seen, last_seen)
 					VALUES (%s, %s, %s, %s, %s, %d, 1, 0, %s, %s)
-					ON DUPLICATE KEY UPDATE hits = hits + 1, seen = 0, last_seen = VALUES(last_seen), detail = VALUES(detail), url = VALUES(url), user_id = VALUES(user_id)',
+					ON DUPLICATE KEY UPDATE hits = hits + 1, seen = 0, resolved_at = NULL, last_seen = VALUES(last_seen), detail = VALUES(detail), url = VALUES(url), user_id = VALUES(user_id)',
 					md5( $kind . '|' . $message ),
 					$kind,
 					$message,
@@ -761,9 +761,9 @@ class MQP_Monitor {
 			? array( 'Image processing', 'ok', 'Profile photos can be resized.' )
 			: array( 'Image processing', 'warn', 'The server cannot resize images, so profile photo uploads fail. Ask Hostinger to enable GD or Imagick for PHP.' );
 
-		$mail_fail = (string) $wpdb->get_var( 'SELECT MAX(last_seen) FROM ' . mqp_table( 'errors' ) . " WHERE kind = 'email' AND last_seen > '" . wp_date( 'Y-m-d H:i:s', time() - 7 * DAY_IN_SECONDS ) . "'" );
+		$mail_fail = (string) $wpdb->get_var( 'SELECT MAX(last_seen) FROM ' . mqp_table( 'errors' ) . " WHERE kind = 'email' AND resolved_at IS NULL AND last_seen > '" . wp_date( 'Y-m-d H:i:s', time() - 7 * DAY_IN_SECONDS ) . "'" );
 		if ( $mail_fail ) {
-			$out[] = array( 'Email', 'bad', 'An email failed to send on ' . mysql2date( 'M j, Y g:i A', $mail_fail ) . '. Order confirmations and account emails may not arrive. See Problems.' );
+			$out[] = array( 'Email', 'bad', 'An email failed to send on ' . mysql2date( 'M j, Y g:i A', $mail_fail ) . '. Order confirmations and account emails may not arrive. See Problems, and click Resolved there once it is fixed.' );
 		} elseif ( ! has_action( 'phpmailer_init' ) ) {
 			$out[] = array( 'Email', 'warn', 'No email (SMTP) plugin found. Order and account emails may land in spam. Install “WP Mail SMTP” and connect your Hostinger mailbox, then send a test email.' );
 		} else {
@@ -792,7 +792,7 @@ class MQP_Monitor {
 			? array( 'PHP version', 'ok', 'PHP ' . PHP_VERSION . '.' )
 			: array( 'PHP version', 'warn', 'PHP ' . PHP_VERSION . ' is old. Choose PHP 8.2 or newer in Hostinger.' );
 
-		$recent = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . mqp_table( 'errors' ) . " WHERE kind <> 'email' AND last_seen > '" . wp_date( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) . "'" );
+		$recent = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . mqp_table( 'errors' ) . " WHERE kind <> 'email' AND resolved_at IS NULL AND last_seen > '" . wp_date( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) . "'" );
 		$out[]  = $recent
 			? array( 'Problems in the last 24 hours', 'warn', "$recent problem(s) recorded. See the Problems tab." )
 			: array( 'Problems in the last 24 hours', 'ok', 'None.' );

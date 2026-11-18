@@ -6,6 +6,14 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.32.1' => array(
+		'date'  => '2026-11-19',
+		'items' => array(
+			'New "Resolved" button on each problem (System → Problems, and Recent problems on the MQ Portal dashboard), plus "Mark all as resolved". A resolved problem no longer counts in Health, and opens again by itself if it happens again. "Open again" undoes it.',
+			'Health: the Email check no longer shows a Problem for failures that are resolved. The "Email Changed" failures fixed in 1.32.0 are marked resolved automatically when you update.',
+			'Sales page redesigned: dark dashboard with a Revenue overview line chart (sales and payments collected, Monthly / Yearly), a POS vs invoices bar chart, a How customers paid donut, sales by shop, and top items and customers with bars. Hover a chart to see the exact amounts. The month-by-month numbers are still there under the charts.',
+		),
+	),
 	'1.32.0' => array(
 		'date'  => '2026-11-19',
 		'items' => array(

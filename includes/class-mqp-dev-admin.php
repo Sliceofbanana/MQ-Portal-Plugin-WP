@@ -180,6 +180,7 @@ class MQP_Dev_Admin {
 			'limits'  => 'Spam limits cleared: everyone can send orders, uploads, quotations and reviews again.',
 			'setup'   => 'Setup ran again: tables, roles, links, folders and scheduled jobs are refreshed.',
 			'flag_ok' => 'Marked as checked.',
+			'resolve' => 'Marked as resolved. It no longer counts in Health, and opens again by itself if it happens again.',
 		);
 		$done = sanitize_key( (string) ( $_GET['done'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		if ( isset( $msgs[ $done ] ) ) {
@@ -266,12 +267,12 @@ class MQP_Dev_Admin {
 		echo '</div>';
 
 		// Recent problems and activity.
-		$errs = $wpdb->get_results( 'SELECT kind, message, hits, seen, last_seen FROM ' . mqp_table( 'errors' ) . ' ORDER BY last_seen DESC LIMIT 6', ARRAY_A );
-		echo '<div class="mqp-card"><div class="mqp-dev-head"><h2>Recent problems</h2><a href="' . esc_url( MQP_System::url( 'errors' ) ) . '">All problems →</a></div>';
+		$errs = $wpdb->get_results( 'SELECT id, kind, message, hits, seen, resolved_at, last_seen FROM ' . mqp_table( 'errors' ) . ' ORDER BY (resolved_at IS NOT NULL) ASC, last_seen DESC LIMIT 6', ARRAY_A );
+		echo '<div class="mqp-card" id="problems"><div class="mqp-dev-head"><h2>Recent problems</h2><a href="' . esc_url( MQP_System::url( 'errors' ) ) . '">All problems →</a></div>';
 		if ( $errs ) {
-			echo '<table class="widefat striped"><thead><tr><th>Last seen</th><th>Type</th><th>Problem</th><th>Times</th></tr></thead><tbody>';
+			echo '<table class="widefat striped"><thead><tr><th>Last seen</th><th>Type</th><th>Problem</th><th>Times</th><th></th></tr></thead><tbody>';
 			foreach ( $errs as $e ) {
-				echo '<tr' . ( $e['seen'] ? '' : ' class="mqp-dev-unseen"' ) . '><td>' . esc_html( mysql2date( 'M j, g:i A', $e['last_seen'] ) ) . '</td><td>' . esc_html( MQP_Monitor::KINDS[ $e['kind'] ] ?? $e['kind'] ) . '</td><td>' . esc_html( wp_trim_words( $e['message'], 18 ) ) . '</td><td>' . (int) $e['hits'] . '</td></tr>';
+				echo '<tr' . ( $e['seen'] ? '' : ' class="mqp-dev-unseen"' ) . '><td>' . esc_html( mysql2date( 'M j, g:i A', $e['last_seen'] ) ) . '</td><td>' . esc_html( MQP_Monitor::KINDS[ $e['kind'] ] ?? $e['kind'] ) . '</td><td>' . esc_html( wp_trim_words( $e['message'], 18 ) ) . '</td><td>' . (int) $e['hits'] . '</td><td>' . ( $e['resolved_at'] ? '<span class="mqp-pill is-ok">Resolved</span>' : '<a class="button button-small" href="' . esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'mqp_system', 'op' => 'resolve', 'tab' => 'errors', 'id' => (int) $e['id'], 'back' => 1 ), admin_url( 'admin-post.php' ) ), 'mqp_system' ) ) . '">Resolved</a>' ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput
 			}
 			echo '</tbody></table>';
 		} else {

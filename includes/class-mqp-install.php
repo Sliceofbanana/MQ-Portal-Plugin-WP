@@ -104,6 +104,12 @@ class MQP_Install {
 				mqp_log( 'users_repaired', array( 'reason' => $n . ' Production staff account(s) moved to the renamed role or given their role back' ) );
 			}
 		}
+		if ( $old && $old < 20 ) {
+			// 1.32.1: problems can be marked Resolved. The "Email Changed" / "Password Changed" failures
+			// to an empty address were fixed in 1.32.0, so those entries start out resolved.
+			global $wpdb;
+			$wpdb->query( 'UPDATE ' . mqp_table( 'errors' ) . " SET resolved_at = '" . esc_sql( mqp_now() ) . "', seen = 1 WHERE kind = 'email' AND message LIKE 'You must provide at least one recipient%' AND (detail LIKE '%Email Changed%' OR detail LIKE '%Password Changed%')" ); // phpcs:ignore WordPress.DB.PreparedSQL
+		}
 		if ( $old && $old < 17 ) {
 			// 1.26.0: online orders take files up to 100 MB each (the owner's request); a saved 50 follows.
 			$s = get_option( MQP_Settings::OPTION, array() );
@@ -535,6 +541,7 @@ class MQP_Install {
   user_id bigint(20) unsigned NOT NULL DEFAULT 0,
   hits int(10) unsigned NOT NULL DEFAULT 1,
   seen tinyint(1) NOT NULL DEFAULT 0,
+  resolved_at datetime DEFAULT NULL,
   first_seen datetime NOT NULL,
   last_seen datetime NOT NULL,
   PRIMARY KEY  (id),
