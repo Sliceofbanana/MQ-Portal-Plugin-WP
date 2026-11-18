@@ -114,6 +114,7 @@ class MQP_Dev_Admin {
 				delete_transient( 'mqp_loopback' );
 				delete_transient( 'mqp_storage_used' );
 				delete_transient( 'mqp_domain_live' );
+				MQP_Monitor::email_health( 'Checked by hand by ' . wp_get_current_user()->display_name );
 				break;
 			case 'daily':
 				do_action( 'mqp_daily' );
@@ -172,7 +173,7 @@ class MQP_Dev_Admin {
 
 		echo '<div class="wrap mqp-sys mqp-dev"><h1 class="wp-heading-inline">MQ Portal dashboard</h1> <a class="page-title-action" href="' . esc_url( $portal ) . '" target="_blank" rel="noopener">Open portal ↗</a><hr class="wp-header-end">';
 		$msgs = array(
-			'recheck' => 'Checked again.',
+			'recheck' => 'Checked again. The health report was emailed to the site admin.',
 			'daily'   => 'The daily job ran.',
 			'hourly'  => 'The hourly job ran (quotation reminders, forgotten shifts).',
 			'purge'   => 'The website page cache is cleared.',

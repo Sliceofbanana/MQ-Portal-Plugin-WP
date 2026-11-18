@@ -6,6 +6,14 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.32.0' => array(
+		'date'  => '2026-11-19',
+		'items' => array(
+			'New wp-admin → MQ Portal → Sales: every sale from the first one recorded to today. Totals (POS + invoices, collected, still to collect, voided POS), a month-by-month table with bars and the best month, sales by shop and branch, top POS items, top customers, how customers paid and online orders. Pick This year, Last 12 months, This month, Last 30 days or your own dates (short ranges show day by day), and download it as a CSV for Excel. Counted the same way as the owner dashboard in the portal.',
+			'Health report by email: every health check is emailed to the site admin (the Administration Email Address in wp-admin → Settings → General), once a day with the daily job and each time someone clicks "Check again" on the MQ Portal dashboard or System page. Problems are listed first, each with how to fix it.',
+			'Fixed: "You must provide at least one recipient email address" in Problems (subject "Email Changed") when adding an email to a staff account that had none. WordPress tried to warn the old, empty address; that warning is now skipped when there was no old address, and still sent when a real address changes. The same goes for the "Password Changed" notice.',
+		),
+	),
 	'1.31.4' => array(
 		'date'  => '2026-11-17',
 		'items' => array(

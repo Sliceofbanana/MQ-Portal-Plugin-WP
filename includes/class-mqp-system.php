@@ -112,6 +112,7 @@ class MQP_System {
 				delete_transient( 'mqp_loopback' );
 				delete_transient( 'mqp_storage_used' );
 				delete_transient( 'mqp_domain_live' );
+				MQP_Monitor::email_health( 'Checked by hand by ' . wp_get_current_user()->display_name );
 				break;
 			case 'seen':
 				$wpdb->query( 'UPDATE ' . mqp_table( 'errors' ) . ' SET seen = 1' );
@@ -193,7 +194,7 @@ class MQP_System {
 		$msgs = array(
 			'setup'             => array( 'success', 'Setup ran again: tables, roles, links, folders and the daily job are refreshed.' ),
 			'daily'             => array( 'success', 'The daily job ran.' ),
-			'recheck'           => array( 'success', 'Checked again.' ),
+			'recheck'           => array( 'success', 'Checked again. The health report was emailed to the site admin.' ),
 			'seen'              => array( 'success', 'All problems marked as read.' ),
 			'clear_errors'      => array( 'success', 'The problem list is cleared.' ),
 			'clear_lockouts'    => array( 'success', 'All locked logins are unlocked.' ),

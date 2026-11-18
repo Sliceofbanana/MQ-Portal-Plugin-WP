@@ -45,6 +45,7 @@ class MQP_Monitor {
 		add_filter( 'rest_pre_dispatch', array( __CLASS__, 'maintenance_gate' ), 10, 3 );
 		add_action( 'wp_mail_failed', array( __CLASS__, 'mail_failed' ) );
 		add_action( 'mqp_daily', array( __CLASS__, 'daily' ), 1 );
+		add_action( 'mqp_daily', array( __CLASS__, 'daily_health' ), 30 ); // After the other daily jobs: the health report email.
 		add_action( 'rest_api_init', array( __CLASS__, 'routes' ) );
 		add_action( 'shutdown', array( __CLASS__, 'check_daily_job' ) );
 		add_action( 'admin_bar_menu', array( __CLASS__, 'admin_bar' ), 100 );
@@ -797,6 +798,67 @@ class MQP_Monitor {
 			: array( 'Problems in the last 24 hours', 'ok', 'None.' );
 
 		return $out;
+	}
+
+	/** Daily job: the health report to the site admin, once a day. */
+	public static function daily_health() {
+		$day = current_time( 'Y-m-d' );
+		if ( get_option( 'mqp_health_mail_day' ) === $day ) {
+			return;
+		}
+		update_option( 'mqp_health_mail_day', $day, false );
+		self::email_health( 'Daily health check' );
+	}
+
+	/**
+	 * Runs every health check fresh and emails the result to the site admin
+	 * (wp-admin → Settings → General → Administration Email Address).
+	 * Sent by the daily job and by each "Check again" (Dashboard and System).
+	 */
+	public static function email_health( $why ) {
+		$to = (string) get_option( 'admin_email' );
+		if ( ! is_email( $to ) ) {
+			return false;
+		}
+		$checks = self::checks( true );
+		$state  = self::overall( $checks );
+		$todo   = count(
+			array_filter(
+				$checks,
+				function ( $c ) {
+					return 'ok' !== $c[1];
+				}
+			)
+		);
+		$head   = array( 'ok' => 'All good', 'warn' => $todo . ' to look at', 'bad' => 'Needs fixing' )[ $state ];
+		$colors = array( 'ok' => array( '#e7f6ec', '#0a7a32', 'OK' ), 'warn' => array( '#fff4e5', '#a35200', 'Check' ), 'bad' => array( '#fdecec', '#b42318', 'Problem' ) );
+		// Problems first, then the rest.
+		usort(
+			$checks,
+			function ( $a, $b ) {
+				$rank = array( 'bad' => 0, 'warn' => 1, 'ok' => 2 );
+				return $rank[ $a[1] ] <=> $rank[ $b[1] ];
+			}
+		);
+		$rows = '';
+		foreach ( $checks as $c ) {
+			$col   = $colors[ $c[1] ] ?? $colors['warn'];
+			$rows .= '<tr><td style="padding:8px 8px 8px 0;border-bottom:1px solid #eef0f4;vertical-align:top;width:70px"><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:' . $col[0] . ';color:' . $col[1] . ';font-size:11px;font-weight:700">' . $col[2] . '</span></td>'
+				. '<td style="padding:8px 0;border-bottom:1px solid #eef0f4;vertical-align:top;font-size:14px"><strong>' . esc_html( $c[0] ) . '</strong><br><span style="color:#545454">' . esc_html( $c[2] ) . '</span></td></tr>';
+		}
+		$unread = self::unread_count();
+		return MQP_Mail::send(
+			$to,
+			'MQ Portal health: ' . $head . ' (' . wp_date( 'M j, g:i A' ) . ')',
+			'Portal health: ' . $head,
+			array(
+				MQP_Mail::pill( $head, 'ok' === $state ? 'ok' : ( 'warn' === $state ? 'warn' : 'bad' ) ),
+				$why . ' on ' . wp_date( 'F j, Y g:i A' ) . ' for ' . home_url() . '.' . ( $unread ? " $unread new problem(s) are waiting in the Problems list." : '' ),
+				array( 'html' => '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;border-collapse:collapse">' . $rows . '</table>' ),
+				'This report goes to the site admin email (wp-admin → Settings → General) once a day and each time someone clicks "Check again" on the MQ Portal dashboard or System page.',
+			),
+			array( 'Open the MQ Portal dashboard', admin_url( 'admin.php?page=' . MQP_Dev_Admin::SLUG ) )
+		);
 	}
 
 	/** 'ok' | 'warn' | 'bad' for a list of checks. */

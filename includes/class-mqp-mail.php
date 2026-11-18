@@ -10,6 +10,15 @@ class MQP_Mail {
 	public static function init() {
 		// Emails from this site never come from "WordPress": the company name is the sender.
 		add_filter( 'wp_mail_from_name', array( __CLASS__, 'from_name' ), 20 );
+		// WordPress warns the OLD address when an email or password changes. Staff accounts made
+		// without an email have no old address, so that warning can only fail: skip it then.
+		add_filter( 'send_email_change_email', array( __CLASS__, 'has_old_email' ), 10, 2 );
+		add_filter( 'send_password_change_email', array( __CLASS__, 'has_old_email' ), 10, 2 );
+	}
+
+	/** Sends WordPress's change notice only when the account had an email address to warn. */
+	public static function has_old_email( $send, $user ) {
+		return $send && is_email( (string) ( $user['user_email'] ?? '' ) );
 	}
 
 	/** Sender name (wp-admin → MQ Portal → System → Settings → Emails), else the company name. */

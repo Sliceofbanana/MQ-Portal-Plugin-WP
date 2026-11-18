@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       MQ Portal
  * Description:       Staff portal for MQ Printing Services: online ordering (/order/), customer file uploads, Invoice Manager (quotations, billing statements, invoices), job order workflow (Sales → Creatives → Production & QC → Delivery), POS, time clock and the owner dashboard.
- * Version:           1.31.4
+ * Version:           1.32.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Genesis Esdrilon Jr
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MQP_VERSION', '1.31.4' );
+define( 'MQP_VERSION', '1.32.0' );
 define( 'MQP_FILE', __FILE__ );
 define( 'MQP_DIR', plugin_dir_path( __FILE__ ) );
 require_once MQP_DIR . 'includes/class-mqp-domain.php';
@@ -51,6 +51,7 @@ require_once MQP_DIR . 'includes/rest/class-mqp-rest-customers.php';
 require_once MQP_DIR . 'includes/class-mqp-website-admin.php';
 require_once MQP_DIR . 'includes/class-mqp-shortcodes-admin.php';
 require_once MQP_DIR . 'includes/class-mqp-dev-admin.php';
+require_once MQP_DIR . 'includes/class-mqp-sales-admin.php';
 require_once MQP_DIR . 'includes/class-mqp-archive.php';
 require_once MQP_DIR . 'includes/class-mqp-gdrive.php';
 require_once MQP_DIR . 'includes/class-mqp-reset.php';
@@ -104,4 +105,5 @@ if ( is_admin() ) {
 	MQP_Website_Admin::init();
 	MQP_Shortcodes_Admin::init();
 	MQP_Dev_Admin::init();
+	MQP_Sales_Admin::init(); // wp-admin → MQ Portal → Sales: every sale from the first one to today.
 }
