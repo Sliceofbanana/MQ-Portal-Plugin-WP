@@ -44,18 +44,34 @@ class MQP_Updater {
 		return $h;
 	}
 
-	/** The latest release: version, zip (API asset link), notes. Cached 6 hours; null when unknown. */
+	/**
+	 * The newest release: version, zip (API asset link), notes. Cached 6 hours; null when unknown.
+	 * The highest version number among the recent releases, not GitHub's "latest" label: two tags
+	 * pushed together get the label in the order they finish, which can be the older version.
+	 */
 	public static function release( $fresh = false ) {
 		$cached = $fresh ? false : get_site_transient( self::TRANSIENT );
 		if ( is_array( $cached ) ) {
 			return $cached['version'] ? $cached : null;
 		}
-		$res  = wp_remote_get( 'https://api.github.com/repos/' . self::repo() . '/releases/latest', array( 'timeout' => 10, 'headers' => self::headers() ) );
+		$res  = wp_remote_get( 'https://api.github.com/repos/' . self::repo() . '/releases?per_page=20', array( 'timeout' => 10, 'headers' => self::headers() ) );
 		$code = (int) wp_remote_retrieve_response_code( $res );
-		$data = json_decode( (string) wp_remote_retrieve_body( $res ), true );
-		$out  = array( 'version' => '', 'package' => '', 'notes' => '', 'url' => '', 'error' => '' );
-		if ( 200 !== $code || ! is_array( $data ) ) {
+		$list = json_decode( (string) wp_remote_retrieve_body( $res ), true );
+		$data = null;
+		foreach ( is_array( $list ) ? $list : array() as $rel ) {
+			$v = ltrim( (string) ( $rel['tag_name'] ?? '' ), 'vV' );
+			if ( ! empty( $rel['draft'] ) || ! empty( $rel['prerelease'] ) || ! preg_match( '/^\d+(\.\d+)*$/', $v ) ) {
+				continue;
+			}
+			if ( ! $data || version_compare( $v, ltrim( (string) $data['tag_name'], 'vV' ), '>' ) ) {
+				$data = $rel;
+			}
+		}
+		$out = array( 'version' => '', 'package' => '', 'notes' => '', 'url' => '', 'error' => '' );
+		if ( 200 !== $code || ! is_array( $list ) ) {
 			$out['error'] = is_wp_error( $res ) ? $res->get_error_message() : 'GitHub answered ' . $code . ( 404 === $code ? ' (no release yet, or the token cannot read the repository)' : '' );
+		} elseif ( ! $data ) {
+			$out['error'] = 'No release yet.';
 		} else {
 			foreach ( (array) ( $data['assets'] ?? array() ) as $a ) {
 				if ( self::ASSET === ( $a['name'] ?? '' ) ) {

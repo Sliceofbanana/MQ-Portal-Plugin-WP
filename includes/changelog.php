@@ -6,6 +6,12 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.33.1' => array(
+		'date'  => '2026-11-19',
+		'items' => array(
+			'Updates: the plugin now offers the highest version on GitHub, not the release GitHub labels "latest". When two versions were released together (1.32.2 and 1.33.0), sites were offered the older one.',
+		),
+	),
 	'1.33.0' => array(
 		'date'  => '2026-11-19',
 		'items' => array(
