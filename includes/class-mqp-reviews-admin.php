@@ -181,6 +181,10 @@ class MQP_Reviews_Admin {
 						'auto_approve' => empty( $_POST['auto_approve'] ) ? 0 : 1,
 						'notify'       => empty( $_POST['notify'] ) ? 0 : 1,
 						'thank'        => empty( $_POST['thank'] ) ? 0 : 1,
+						'ask_on'       => empty( $_POST['ask_on'] ) ? 0 : 1,
+						'ask_paid'     => empty( $_POST['ask_paid'] ) ? 0 : 1,
+						'ask_delay'    => isset( MQP_Review_Requests::DELAYS[ (int) ( $_POST['ask_delay'] ?? 24 ) ] ) ? (int) $_POST['ask_delay'] : 24,
+						'ask_message'  => substr( sanitize_textarea_field( wp_unslash( (string) ( $_POST['ask_message'] ?? '' ) ) ), 0, 600 ),
 					)
 				);
 				MQP_Monitor::log( 'system', 'Saved the reviews settings' );
@@ -599,6 +603,19 @@ class MQP_Reviews_Admin {
 		$lim = (int) MQP_Monitor::settings()['limit_reviews'];
 		echo '<tr><th>Spam protection</th><td>At most ' . $lim . ' reviews per hour and ' . ( 2 * $lim ) . ' per day from the same internet connection, ' . MQP_Reviews::DAY_MAX . ' per day from everyone together, ' . MQP_Reviews::PENDING_MAX . ' waiting at most, the same text only once, pictures at most 3 MB (saved as a small 240 px picture), a hidden spam trap, and the Cloudflare Turnstile check when it is set up. Change the per-hour limit in System → Settings → Spam limits.</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput
 		echo '<tr><th>Below 4 stars</th><td>Never shown on the website. They are kept under Reviews → Hidden so you can read the feedback.</td></tr>';
+		echo '</table>';
+		// Ask for a review after each order.
+		$rq  = MQP_Review_Requests::counts();
+		$sel = '<select name="ask_delay">';
+		foreach ( MQP_Review_Requests::DELAYS as $h => $label ) {
+			$sel .= '<option value="' . (int) $h . '"' . selected( (int) $o['ask_delay'], $h, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		$sel .= '</select>';
+		echo '<h2 id="ask">Ask customers for a review</h2><p class="description">After each order, the customer gets a personal link to rate it. The review comes here like a "Leave a Review" one, marked <em>Verified customer</em>: 4–5 stars go on the website (with the approval setting above), below 4 stars stay private. One review per link.</p><table class="form-table" role="presentation">';
+		echo '<tr><th>Email the review link</th><td><label><input type="checkbox" name="ask_on" value="1"' . checked( $o['ask_on'], 1, false ) . '> When a job order is marked <strong>Delivered</strong> and the customer has an email on file</label><p><label><input type="checkbox" name="ask_paid" value="1"' . checked( $o['ask_paid'], 1, false ) . '> Also when an invoice without a job order is <strong>fully paid</strong></label></p><p class="description">At most one review email per customer every ' . (int) MQP_Review_Requests::GAP_DAYS . ' days. Without an email, staff copy the message from the delivered job order in the portal and send it on Messenger or Viber.</p></td></tr>';
+		echo '<tr><th>When</th><td>' . $sel . ' <span class="description">after delivery / payment</span></td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput
+		echo '<tr><th>Message staff copy</th><td><textarea name="ask_message" rows="3" class="large-text" placeholder="' . esc_attr( MQP_Review_Requests::default_message() ) . '">' . esc_textarea( $o['ask_message'] ) . '</textarea><p class="description">Shown on delivered job orders in the portal (Copy message). <code>{name}</code> = the customer\'s first name, <code>{order}</code> = order or invoice number, <code>{link}</code> = their review link. Leave empty for the default.</p></td></tr>';
+		echo '<tr><th>So far</th><td>' . (int) $rq['total'] . ' links made · ' . (int) $rq['sent'] . ' emailed · ' . (int) $rq['waiting'] . ' scheduled · ' . (int) $rq['opened'] . ' opened · <strong>' . (int) $rq['reviewed'] . ' reviews received</strong></td></tr>';
 		echo '</table><p><button class="button button-primary">Save settings</button></p></form>';
 	}
 

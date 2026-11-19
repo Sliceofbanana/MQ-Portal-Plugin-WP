@@ -14,7 +14,7 @@ class MQP_Monitor {
 	const OPT = 'mqp_monitor';
 
 	/** Every table the plugin needs (without the wp_mq_ prefix). */
-	const TABLES = array( 'brands', 'branches', 'customers', 'documents', 'document_items', 'payments', 'jobs', 'job_events', 'uploads', 'files', 'orders', 'commissions', 'pos_products', 'pos_sales', 'pos_sale_items', 'printer_readings', 'attendance', 'attendance_breaks', 'audit_log', 'signups', 'errors', 'counters', 'reviews', 'notifications', 'archives' );
+	const TABLES = array( 'brands', 'branches', 'customers', 'documents', 'document_items', 'payments', 'jobs', 'job_events', 'uploads', 'files', 'orders', 'commissions', 'pos_products', 'pos_sales', 'pos_sale_items', 'printer_readings', 'attendance', 'attendance_breaks', 'audit_log', 'signups', 'errors', 'counters', 'reviews', 'notifications', 'archives', 'review_requests' );
 
 	/** Kinds of problems, as shown to the admin. */
 	const KINDS = array(

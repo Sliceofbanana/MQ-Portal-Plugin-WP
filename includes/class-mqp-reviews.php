@@ -44,6 +44,11 @@ class MQP_Reviews {
 			'auto_approve'  => 0,  // Website reviews appear right away (otherwise they wait for approval).
 			'notify'        => 1,  // Email the admins about new website reviews.
 			'thank'         => 1,  // Thank the customer by email (when they gave one).
+			// Ask for a review (MQP_Review_Requests).
+			'ask_on'        => 1,  // Email the review link after delivery / full payment.
+			'ask_paid'      => 1,  // Also for invoices without a job order, once fully paid.
+			'ask_delay'     => 24, // Hours after delivery / payment.
+			'ask_message'   => '', // Message staff copy ('' = the default).
 			'google_key'    => '',
 			'google_place'  => '',
 			'google_auto'   => 1,  // New Google reviews are shown right away…
@@ -339,7 +344,7 @@ class MQP_Reviews {
 	}
 
 	/** The admins' email about a new review: stars, the text, what happens next, one button. */
-	private static function email_admins( $id, $name, $rating, $body, $email, $status, $private ) {
+	public static function email_admins( $id, $name, $rating, $body, $email, $status, $private ) {
 		// The portal's Reviews tab (staff never need wp-admin).
 		$page = MQP_Portal::url() . '#/admin/reviews/' . ( $private ? 'hidden' : $status );
 		if ( $private ) {
@@ -369,7 +374,7 @@ class MQP_Reviews {
 	}
 
 	/** Thank-you email to the customer who left the review. */
-	private static function email_thanks( $email, $name, $status, $private ) {
+	public static function email_thanks( $email, $name, $status, $private ) {
 		$first = strtok( trim( $name ), ' ' );
 		$text  = $private
 			? 'Thank you for taking the time to tell us how we did. We read every message, and your feedback helps us do better. If you would like us to contact you about it, just reply to this email.'

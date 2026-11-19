@@ -298,6 +298,39 @@ function stageActions(job, act) {
           }, 'btn-primary')));
       }
       break;
+    case 'delivered': {
+      // Ask for a review: the customer's personal link, emailed automatically when there is an email,
+      // and a ready-made message staff copy to Messenger or Viber.
+      const r = job.review;
+      if (!r) break;
+      const tone = { reviewed: 'ok', sent: 'info', waiting: 'info', failed: 'bad' }[r.status] || '';
+      const status = r.status === 'reviewed'
+        ? `Review received${r.rating ? ' · ' + '★'.repeat(r.rating) : ''} · ${fmtDate(r.reviewed_at, true)}`
+        : r.status === 'sent' ? `Emailed to ${r.email} · ${fmtDate(r.sent_at, true)}${r.opened_at ? ' · opened' : ''}`
+        : r.status === 'waiting' ? `Email to ${r.email} goes out ${fmtDate(r.send_at, true)}`
+        : r.status === 'failed' ? 'The email could not be sent. Copy the message below instead.'
+        : r.email ? 'Not emailed (already asked recently, or emails are off). Copy the message below.' : 'No email on file. Copy the message below and send it on Messenger or Viber.';
+      box.append(h('h3', 'Ask for a review'), h('p', badge(r.label, tone), ' ', h('span.muted', status)));
+      if (r.status !== 'reviewed') {
+        const msg = h('textarea.ready-msg', { rows: 4, 'aria-label': 'Review request message', value: r.message });
+        box.append(h('div.ready-msg-wrap', h('span.muted', 'Message for the customer (you can edit it before sending)'), msg,
+          h('div.actions',
+            btn('Copy message', async e => {
+              const b = e.currentTarget;
+              try { await navigator.clipboard.writeText(msg.value); } catch (_) { msg.select(); document.execCommand('copy'); }
+              b.textContent = 'Copied ✓';
+              toast('Message copied. Paste it in Messenger or Viber.');
+              setTimeout(() => { b.textContent = 'Copy message'; }, 2000);
+            }, 'btn-primary'),
+            btn('Copy link only', async e => {
+              const b = e.currentTarget;
+              try { await navigator.clipboard.writeText(r.link); } catch (_) { /* ignore */ }
+              b.textContent = 'Copied ✓';
+              setTimeout(() => { b.textContent = 'Copy link only'; }, 2000);
+            }))));
+      }
+      break;
+    }
     default:
       return h('span');
   }

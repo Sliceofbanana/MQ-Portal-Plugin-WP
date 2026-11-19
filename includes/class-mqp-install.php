@@ -571,6 +571,31 @@ class MQP_Install {
   KEY reviewed_at (reviewed_at)
 ) $c;";
 
+		// Review requests (1.33.0): a personal "rate your order" link per delivered job order or paid invoice.
+		$sql[] = "CREATE TABLE {$t('review_requests')} (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  token char(32) NOT NULL,
+  kind varchar(10) NOT NULL,
+  ref_id bigint(20) unsigned NOT NULL,
+  document_id bigint(20) unsigned DEFAULT NULL,
+  reference varchar(60) NOT NULL DEFAULT '',
+  customer_name varchar(150) NOT NULL DEFAULT '',
+  email varchar(150) NOT NULL DEFAULT '',
+  phone varchar(40) NOT NULL DEFAULT '',
+  status varchar(10) NOT NULL DEFAULT 'manual',
+  send_at datetime DEFAULT NULL,
+  sent_at datetime DEFAULT NULL,
+  opened_at datetime DEFAULT NULL,
+  review_id bigint(20) unsigned DEFAULT NULL,
+  reviewed_at datetime DEFAULT NULL,
+  created_at datetime NOT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY token (token),
+  UNIQUE KEY kind_ref (kind,ref_id),
+  KEY status_send (status,send_at),
+  KEY email (email)
+) $c;";
+
 		// Notifications in the portal (the bell). One row per person.
 		$sql[] = "CREATE TABLE {$t('notifications')} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,

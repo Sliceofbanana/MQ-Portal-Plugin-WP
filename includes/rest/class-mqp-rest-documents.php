@@ -554,6 +554,7 @@ class MQP_REST_Documents {
 			MQP_REST_Jobs::upsert_commission( (int) $doc['job_id'] );
 			MQP_REST_Jobs::maybe_earn( (int) $doc['job_id'] );
 		}
+		do_action( 'mqp_payment_added', (int) $doc['id'] ); // Review request when an invoice is fully paid.
 		if ( MQP_REST_Sync::running() ) { // Payments through the website's REST path are logged by MQP_Monitor.
 			MQP_Monitor::log( 'payment_recorded', $doc['number'] . ' · ₱' . number_format( $amount, 2 ) . ' · ' . $method . ' (offline, synced)' );
 		}

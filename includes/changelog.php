@@ -6,6 +6,15 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.33.0' => array(
+		'date'  => '2026-11-19',
+		'items' => array(
+			'New: Ask for a review. When a job order is marked Delivered (or an invoice without a job order is fully paid), the customer gets a personal "Rate your order" link. With an email on file it is emailed automatically, 1 day later by default; at most one review email per customer every 60 days.',
+			'Delivered job orders in the portal now show "Ask for a review": whether the email went out, was opened or the review came in, plus a ready-made message with the link to Copy for Messenger or Viber (and Copy link only).',
+			'The review page (/order/review/) is a simple mobile page: tap the stars, write a few words, add a photo if you like. The review lands in Reviews marked "Verified customer": 4-5 stars go on the website (right away or after your approval), below 4 stars stay private. Each link works once.',
+			'wp-admin → MQ Portal → Reviews → Settings: turn the emails on or off (delivered job orders, fully paid invoices), choose when they go out, edit the message staff copy, and see how many links were sent, opened and reviewed.',
+		),
+	),
 	'1.32.2' => array(
 		'date'  => '2026-11-19',
 		'items' => array(

@@ -187,6 +187,10 @@ class MQP_REST_Jobs {
 			$job['order_ref']     = '' !== $job['contact']['reference'] ? $job['contact']['reference'] : ( ! empty( $job['invoice_number'] ) ? $job['invoice_number'] : $job['number'] );
 			$job['ready_message'] = MQP_Order::ready_message( '' !== $job['contact']['name'] ? $job['contact']['name'] : $job['customer_name'], $job['order_ref'] );
 		}
+		if ( 'delivered' === $job['stage'] && current_user_can( 'mq_deliver' ) ) {
+			// "Ask for a review": the personal review link, a message staff copy, and whether it was emailed.
+			$job['review'] = MQP_Review_Requests::for_job( $id );
+		}
 		if ( ! self::sees_prices() ) {
 			// Creatives/production don't need prices.
 			foreach ( $job['items'] as &$it ) {
