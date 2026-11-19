@@ -1026,6 +1026,54 @@ class MQP_System {
 .mqp-sys .mqp-inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .mqp-sys .mqp-photo-pick{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.mqp-sys .mqp-photo-pick img{width:180px;height:110px;object-fit:cover;border-radius:6px;border:1px solid #dcdcde;background:#f6f7f7}
 @media (max-width:1100px){.mqp-sys .mqp-grid,.mqp-sys .mqp-grid-even{grid-template-columns:1fr}}
-</style>';
+' . self::modern_css() . '</style>';
+	}
+
+	/**
+	 * One modern look for every MQ Portal page in wp-admin (same feel as the Sales page):
+	 * soft grey page, white rounded cards, no coloured side stripes, rounded tables, inputs and buttons.
+	 */
+	public static function modern_css() {
+		$w = 'body.wp-admin .wrap:is(.mqp-sys,.mqp-wrap)';
+		return '
+#wpcontent:has(.wrap.mqp-sys),#wpcontent:has(.wrap.mqp-wrap){background:#f6f7f9}
+' . $w . '{--mq-line:#e7e8ec;--mq-soft:#f1f2f4;--mq-txt:#18181b;--mq-mute:#52525b;--mq-acc:#f97316;color:var(--mq-txt);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+' . $w . ' h1{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--mq-txt)}
+' . $w . ' .mqp-intro,' . $w . ' .description{color:var(--mq-mute)}
+' . $w . ' .mqp-card,' . $w . ' .mqp-dev-tile,' . $w . ' .mqp-status,' . $w . ' .postbox,' . $w . ' .card{background:#fff;border:1px solid var(--mq-line);border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+' . $w . ' .mqp-card{padding:18px 20px}
+' . $w . ' .mqp-card h2{font-size:15px;font-weight:700}
+' . $w . ' .mqp-dev-tile{border-radius:14px;padding:16px 18px}
+' . $w . ' .mqp-dev-tile strong{font-weight:700;letter-spacing:-.02em}
+' . $w . ' a.mqp-dev-tile:hover{border-color:#fdba74;box-shadow:0 4px 14px rgba(16,24,40,.08)}
+' . $w . ' .mqp-dev-tile.is-ok strong{color:#047857}' . $w . ' .mqp-dev-tile.is-warn strong{color:#b45309}' . $w . ' .mqp-dev-tile.is-bad strong{color:#b91c1c}
+' . $w . ' .mqp-status{border-left-width:1px}
+' . $w . ' .mqp-status.is-ok{background:#ecfdf5;border-color:#a7f3d0}' . $w . ' .mqp-status.is-warn{background:#fffbeb;border-color:#fde68a}' . $w . ' .mqp-status.is-bad{background:#fef2f2;border-color:#fecaca}
+' . $w . ' .mqp-card.is-maint{border-left-width:1px;background:#fef2f2;border-color:#fecaca}' . $w . ' .mqp-card.is-live{border-left-width:1px;background:#ecfdf5;border-color:#a7f3d0}
+' . $w . ' .mqp-pill{border-radius:999px;text-transform:none;letter-spacing:0;font-size:11px;padding:2px 10px}
+' . $w . ' table.widefat{border:1px solid var(--mq-line);border-radius:12px;overflow:hidden;box-shadow:none;border-collapse:separate;border-spacing:0}
+' . $w . ' table.widefat thead th,' . $w . ' table.widefat thead td,' . $w . ' table.widefat tfoot th{background:#fafafb;color:#71717a;font-weight:600;font-size:12px;border-bottom:1px solid var(--mq-line)}
+' . $w . ' table.widefat td,' . $w . ' table.widefat tbody th{border-bottom:1px solid var(--mq-soft)}
+' . $w . ' table.widefat tbody tr:last-child td,' . $w . ' table.widefat tbody tr:last-child th{border-bottom:0}
+' . $w . ' .striped>tbody>:nth-child(odd){background:#fff}' . $w . ' table.widefat tbody tr:hover td,' . $w . ' table.widefat tbody tr:hover th{background:#fafafb}
+' . $w . ' .mqp-card table.widefat{margin-top:4px}
+' . $w . ' .button{border-radius:8px;min-height:32px;line-height:30px;border-color:#d4d6dc;color:var(--mq-txt);background:#fff;padding:0 12px}
+' . $w . ' .button:hover{border-color:#a1a1aa;background:#fafafb;color:var(--mq-txt)}
+' . $w . ' .button.button-small{min-height:26px;line-height:24px;padding:0 10px;font-size:12px}
+' . $w . ' .button-primary{background:var(--mq-acc);border-color:var(--mq-acc);color:#fff}
+' . $w . ' .button-primary:hover,' . $w . ' .button-primary:focus{background:#ea580c;border-color:#ea580c;color:#fff}
+' . $w . ' .page-title-action{border-radius:8px;border-color:#d4d6dc;color:var(--mq-txt);background:#fff;padding:5px 12px}
+' . $w . ' .page-title-action:hover{border-color:var(--mq-acc);color:#c2410c;background:#fff}
+' . $w . ' input[type=text],' . $w . ' input[type=email],' . $w . ' input[type=number],' . $w . ' input[type=url],' . $w . ' input[type=search],' . $w . ' input[type=date],' . $w . ' input[type=password],' . $w . ' select,' . $w . ' textarea{border-radius:8px;border-color:#d4d6dc}
+' . $w . ' input:focus,' . $w . ' select:focus,' . $w . ' textarea:focus{border-color:var(--mq-acc);box-shadow:0 0 0 1px var(--mq-acc)}
+' . $w . ' .nav-tab-wrapper{border-bottom:0;display:inline-flex;flex-wrap:wrap;gap:2px;background:var(--mq-soft);border:1px solid var(--mq-line);border-radius:12px;padding:3px;margin:8px 0 4px}
+' . $w . ' .nav-tab{border:0;background:transparent;border-radius:9px;margin:0;padding:6px 14px;color:var(--mq-mute);font-weight:600;font-size:13px}
+' . $w . ' .nav-tab:hover{color:var(--mq-txt);background:transparent}
+' . $w . ' .nav-tab-active,' . $w . ' .nav-tab-active:hover{background:#fff;color:var(--mq-txt);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+' . $w . ' .subsubsub a.current{color:#c2410c}
+' . $w . ' .notice{border-radius:10px}
+' . $w . ' .mqp-ws-bar{background:var(--mq-soft)}' . $w . ' .mqp-ws-bar span{background:var(--mq-acc)}
+' . $w . ' .mqp-errors tr.is-new td{background:#fffbeb}
+';
 	}
 }

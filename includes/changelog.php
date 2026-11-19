@@ -6,6 +6,13 @@
 defined( 'ABSPATH' ) || exit;
 
 return array(
+	'1.32.2' => array(
+		'date'  => '2026-11-19',
+		'items' => array(
+			'Sales page is now light (white cards on a soft grey page) instead of black. The coloured stripes on the left of the Collected and Still to collect cards are gone; the amount itself is coloured instead.',
+			'Every MQ Portal page in wp-admin (Dashboard, System, Reviews, Previous orders, Print collection, Shortcodes) has the same modern look as the Sales page: rounded white cards, no coloured side stripes, cleaner tables, pill-style tabs, rounded buttons and fields, and orange main buttons.',
+		),
+	),
 	'1.32.1' => array(
 		'date'  => '2026-11-19',
 		'items' => array(
